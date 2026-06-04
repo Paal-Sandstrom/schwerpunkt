@@ -8,10 +8,11 @@ import re
 import difflib
 from datetime import datetime
 
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 import yfinance as yf
 import pandas as pd
 import requests
+import db
 
 app = Flask(__name__)
 app.secret_key = 'schwerpunkt_secret_key'
@@ -838,6 +839,66 @@ def get_market_movers():
     return movers_data
 
 # ---------------------------------------------------------
+# NEW FRONT PAGE FEATURES (Sector Heatmap & Economic Calendar)
+# ---------------------------------------------------------
+def get_sector_performance():
+    """Fetch 1-day percentage change for SPDR Sector ETFs to build the heatmap."""
+    cache_key = "sector_performance"
+    cached = app_cache.get(cache_key)
+    if cached:
+        return cached
+
+    sectors = {
+        'Technology': 'XLK',
+        'Healthcare': 'XLV',
+        'Financials': 'XLF',
+        'Energy': 'XLE',
+        'Consumer Disc': 'XLY',
+        'Industrials': 'XLI',
+        'Consumer Staples': 'XLP',
+        'Utilities': 'XLU',
+        'Materials': 'XLB',
+        'Real Estate': 'XLRE',
+        'Communication': 'XLC'
+    }
+    
+    results = []
+    try:
+        data = yf.download(list(sectors.values()), period="5d", progress=False)
+        if not data.empty and 'Close' in data:
+            closes = data['Close']
+            for name, ticker in sectors.items():
+                if ticker in closes and len(closes[ticker].dropna()) >= 2:
+                    series = closes[ticker].dropna()
+                    prev = series.iloc[-2]
+                    curr = series.iloc[-1]
+                    pct_change = ((curr - prev) / prev) * 100
+                    results.append({'name': name, 'ticker': ticker, 'pct_change': pct_change})
+                else:
+                    results.append({'name': name, 'ticker': ticker, 'pct_change': 0.0})
+    except Exception as e:
+        print(f"Error fetching sectors: {e}")
+        for name, ticker in sectors.items():
+            results.append({'name': name, 'ticker': ticker, 'pct_change': 0.0})
+            
+    app_cache.set(cache_key, results, ttl=1800) # 30 min cache
+    return results
+
+def get_economic_calendar_mock():
+    """Returns a realistic mock economic calendar for the retro UI."""
+    return [
+        {"date": "Mon 08:30 AM", "event": "Core CPI (MoM)", "impact": "High", "actual": "0.3%", "forecast": "0.3%"},
+        {"date": "Mon 08:30 AM", "event": "CPI (YoY)", "impact": "High", "actual": "3.1%", "forecast": "3.1%"},
+        {"date": "Tue 10:00 AM", "event": "CB Consumer Confidence", "impact": "Med", "actual": "104.2", "forecast": "101.5"},
+        {"date": "Wed 02:00 PM", "event": "FOMC Economic Projections", "impact": "High", "actual": "-", "forecast": "-"},
+        {"date": "Wed 02:00 PM", "event": "Fed Interest Rate Decision", "impact": "High", "actual": "-", "forecast": "5.50%"},
+        {"date": "Wed 02:30 PM", "event": "FOMC Press Conference", "impact": "High", "actual": "-", "forecast": "-"},
+        {"date": "Thu 08:30 AM", "event": "Initial Jobless Claims", "impact": "Med", "actual": "-", "forecast": "215K"},
+        {"date": "Thu 08:30 AM", "event": "Retail Sales (MoM)", "impact": "High", "actual": "-", "forecast": "0.4%"},
+        {"date": "Fri 09:45 AM", "event": "S&P Global Manufacturing PMI", "impact": "Med", "actual": "-", "forecast": "50.2"}
+    ]
+
+# ---------------------------------------------------------
 # INTERACTIVE DATA-SERIES GENERATION
 # ---------------------------------------------------------
 def get_chart_quotes_data(symbol, period="1y"):
@@ -986,7 +1047,7 @@ def run_dcf_valuation(fcf_base, growth_rate, discount_rate, terminal_growth_rate
 
 @app.route('/')
 def index():
-    """Index view displaying indices quote grid, movers, and side-by-side index charts."""
+    """Index view displaying indices quote grid, movers, side-by-side index charts, and user projects."""
     start_time = time.time()
     try:
         indices = get_indices_data()
@@ -998,16 +1059,32 @@ def index():
         movers = {'gainers': [], 'losers': [], 'active': []}
         charts = {'sp500_data': [], 'russell3000_data': []}
         
+    try:
+        folders = db.get_folders()
+        for f in folders:
+            f['notes'] = db.get_notes_by_folder(f['id'])[:5]
+    except Exception as e:
+        print(f"DB error: {e}")
+        folders = []
+        
     query_time = f"{(time.time() - start_time):.3f}s"
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    charts = get_index_charts()
+    
+    # NEW: Fetch sector performance and calendar
+    sector_performance = get_sector_performance()
+    economic_calendar = get_economic_calendar_mock()
     
     return render_template(
         'index.html',
         indices=indices,
+        charts=charts,
+        sector_performance=sector_performance,
+        economic_calendar=economic_calendar,
         gainers=movers['gainers'],
         losers=movers['losers'],
         active=movers['active'],
-        charts=charts,
+        folders=folders,
         query_time=query_time,
         current_time=current_time
     )
@@ -1190,19 +1267,22 @@ def ticker_detail(symbol):
                 growth_pct = float(request.args.get('growth', raw['default_growth']))
                 discount_pct = float(request.args.get('discount', 9.0))
                 terminal_pct = float(request.args.get('terminal', 2.5))
+                custom_fcf = float(request.args.get('fcf_base', raw['fcf_base']))
                 
                 if growth_pct < -50 or growth_pct > 200: growth_pct = raw['default_growth']
                 if discount_pct < 2 or discount_pct > 30: discount_pct = 9.0
                 if terminal_pct < 0 or terminal_pct > 10: terminal_pct = 2.5
+                if custom_fcf <= 0: custom_fcf = raw['fcf_base']
                 
                 dcf_params = {
                     'growth': growth_pct,
                     'discount': discount_pct,
-                    'terminal': terminal_pct
+                    'terminal': terminal_pct,
+                    'fcf_base': custom_fcf
                 }
                 
                 dcf_calc = run_dcf_valuation(
-                    fcf_base=raw['fcf_base'],
+                    fcf_base=custom_fcf,
                     growth_rate=growth_pct / 100.0,
                     discount_rate=discount_pct / 100.0,
                     terminal_growth_rate=terminal_pct / 100.0,
@@ -1401,6 +1481,27 @@ def query_ticker():
         
     return redirect(url_for('ticker_detail', symbol=symbol))
 
+@app.route('/api/folder/<int:folder_id>/data', methods=['GET'])
+def get_folder_data(folder_id):
+    try:
+        notes = db.get_notes_by_folder(folder_id)
+        cells = db.get_spreadsheet_data(folder_id)
+        return jsonify({'success': True, 'notes': notes, 'cells': cells})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/api/folder/<int:folder_id>/spreadsheet', methods=['POST'])
+def save_spreadsheet_cell(folder_id):
+    try:
+        data = request.json
+        row = data.get('row')
+        col = data.get('col')
+        value = data.get('value')
+        db.update_spreadsheet_cell(folder_id, row, col, value)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
 @app.route('/api/terminal', methods=['POST'])
 def terminal_command():
     data = request.json
@@ -1414,6 +1515,111 @@ def terminal_command():
     
     try:
         cmd_lower = cmd.lower()
+        if action == 'mkdir':
+            if len(parts) < 2:
+                return jsonify({'action': 'print', 'text': 'Usage: mkdir <foldername>'})
+            folder_name = parts[1]
+            success, msg = db.create_folder(folder_name)
+            return jsonify({'action': 'print', 'text': msg})
+            
+        elif action == 'cd':
+            if len(parts) < 2 or parts[1] == '..':
+                session.pop('active_folder', None)
+                session.pop('active_folder_id', None)
+                return jsonify({'action': 'cd', 'text': 'Reset to root directory.', 'prompt': '>'})
+            folder_name = parts[1]
+            folder = db.get_folder_by_name(folder_name)
+            if folder:
+                session['active_folder'] = folder['name']
+                session['active_folder_id'] = folder['id']
+                return jsonify({'action': 'cd', 'text': f'Entered folder {folder["name"]}', 'prompt': f'{folder["name"]} >'})
+            return jsonify({'action': 'print', 'text': f'Folder {folder_name} not found.'})
+            
+        elif action == 'cat':
+            if len(parts) < 2:
+                return jsonify({'action': 'print', 'text': 'Usage: cat <note_id>'})
+            note_id = parts[1]
+            if note_id.isdigit():
+                conn = db.get_db()
+                c = conn.cursor()
+                c.execute('SELECT * FROM notes WHERE id = ?', (int(note_id),))
+                n = c.fetchone()
+                conn.close()
+                if n:
+                    sentiment = f"[{n['sentiment'].upper()}]" if n['sentiment'] != 'neutral' else ""
+                    price_str = f"Price @ Creation: ${n['price_at_creation']:.2f}" if n['price_at_creation'] else ""
+                    full_text = f"--- Note {n['id']} ---\nCreated: {n['created_at'][:16]}\nSentiment: {sentiment}\n{price_str}\n\n{n['content']}\n-------------------"
+                    return jsonify({'action': 'print', 'text': full_text})
+            return jsonify({'action': 'print', 'text': f'Note {note_id} not found.'})
+            
+        elif action == 'ls':
+            active_folder_id = session.get('active_folder_id')
+            if not active_folder_id:
+                folders = db.get_folders()
+                if not folders:
+                    return jsonify({'action': 'print', 'text': 'No folders found. Use mkdir <foldername> to create one.'})
+                folder_names = [f["name"] for f in folders]
+                return jsonify({'action': 'print', 'text': "Folders:\n" + "  ".join(folder_names)})
+            else:
+                notes = db.get_notes_by_folder(active_folder_id)
+                if not notes:
+                    return jsonify({'action': 'print', 'text': 'No notes in this folder.'})
+                lines = []
+                for n in notes:
+                    sentiment = f"[{n['sentiment'].upper()}] " if n['sentiment'] != 'neutral' else ""
+                    price_tag = f" (Price @ Creation: ${n['price_at_creation']:.2f})" if n['price_at_creation'] else ""
+                    lines.append(f"Note {n['id']}: {sentiment}{n['content']}{price_tag}")
+                return jsonify({'action': 'print', 'text': "\n".join(lines)})
+                
+        elif action == 'note':
+            active_folder_id = session.get('active_folder_id')
+            if not active_folder_id:
+                return jsonify({'action': 'print', 'text': 'You must be inside a folder to create a note. Use cd <foldername>.'})
+            
+            sentiment = 'neutral'
+            args = parts[1:]
+            if args and args[0] in ['--bullish', '--bearish', '--neutral']:
+                sentiment = args[0].replace('--', '')
+                args = args[1:]
+                
+            # Parse title enclosed in quotes if present
+            title = "UNTITLED NOTE"
+            content = " ".join(args)
+            title_match = re.match(r'^"([^"]+)"\s*(.*)$', content)
+            if title_match:
+                title = title_match.group(1).upper()
+                content = title_match.group(2)
+                
+            if not content and not title_match:
+                return jsonify({'action': 'print', 'text': 'Usage: note [--bullish|--bearish] ["Title"] <content>'})
+                
+            cashtags = re.findall(r'\$([A-Za-z]+)', content)
+            price = None
+            if cashtags:
+                ticker_sym = cashtags[0].upper()
+                try:
+                    info = yf.Ticker(ticker_sym).fast_info
+                    price = info.last_price
+                except:
+                    pass
+            
+            db.create_note(active_folder_id, title, content, sentiment, price)
+            return jsonify({'action': 'print', 'text': f'Note "{title}" saved successfully.'})
+            
+        elif action == 'rm':
+            if len(parts) < 2:
+                return jsonify({'action': 'print', 'text': 'Usage: rm <foldername> or rm <note_id>'})
+            target = parts[1]
+            if target.isdigit():
+                deleted = db.delete_note(int(target))
+                if deleted:
+                    return jsonify({'action': 'print', 'text': f'Deleted note {target}.'})
+            success, msg = db.delete_folder(target)
+            if success and session.get('active_folder') == target:
+                session.pop('active_folder', None)
+                session.pop('active_folder_id', None)
+            return jsonify({'action': 'print', 'text': msg})
+
         if cmd_lower.startswith('balance sheet'):
             parts = cmd.split()
             ticker = parts[-1].upper()
@@ -1469,7 +1675,7 @@ def terminal_command():
 
         elif action == 'help':
             help_text = (
-                "AVAILABLE COMMANDS:\n"
+                "[ FINANCIAL LOOKUPS ]\n"
                 "- balance sheet [ticker] : Open balance sheet\n"
                 "- income statement [ticker] : Open income statement\n"
                 "- cash flow [ticker] : Open cash flow statement\n"
@@ -1477,7 +1683,18 @@ def terminal_command():
                 "- price [ticker] : Get current price info\n"
                 "- pe [ticker] : Get P/E ratio\n"
                 "- [metric] [year] [ticker] : Search any financial metric\n"
+                "\n"
+                "[ RESEARCH FOLDERS ]\n"
+                "- mkdir [name] : Create a new research folder\n"
+                "- cd [name] : Enter a research folder (or 'cd ..' to exit)\n"
+                "- ls : List notes in current folder\n"
+                "- note [\"Title\"] [text] : Add a note to the current folder\n"
+                "- cat [id] : View full contents of a note\n"
+                "- rm [name] : Delete a research folder\n"
+                "\n"
+                "[ SYSTEM ]\n"
                 "- nav [ticker] : Navigate main window to ticker page\n"
+                "- /panic : Liquidate all assets and scramble MAC address\n"
                 "- clear : Clear terminal output"
             )
             return jsonify({'action': 'print', 'text': help_text})
@@ -1539,13 +1756,29 @@ def terminal_command():
                     parts.pop(i)
                     break
             
-            ticker = parts[-1].upper()
-            metric_query = " ".join(parts[:-1]).lower()
+            if len(parts) < 2:
+                return jsonify({'error': "Invalid metric query. Try: [ticker] [metric] [year]"})
                 
-            # GCP FIX: Injected global desktop session context
+            # Detect ticker position (first or last)
+            if parts[0].upper().isalpha() and len(parts[0]) <= 5 and len(parts[-1]) > 5:
+                ticker = parts[0].upper()
+                metric_query = " ".join(parts[1:]).lower()
+            elif parts[-1].upper().isalpha() and len(parts[-1]) <= 5:
+                ticker = parts[-1].upper()
+                metric_query = " ".join(parts[:-1]).lower()
+            else:
+                # Default assume first is ticker
+                ticker = parts[0].upper()
+                metric_query = " ".join(parts[1:]).lower()
+                
             stock = yf.Ticker(ticker)
             all_indexes = {}
-            for df in [stock.financials, stock.balance_sheet, stock.cashflow]:
+            try:
+                dfs = [stock.income_stmt, stock.balance_sheet, stock.cashflow]
+            except Exception:
+                dfs = [stock.financials, stock.balance_sheet, stock.cashflow]
+                
+            for df in dfs:
                 if df is not None and not df.empty:
                     for idx in df.index:
                         all_indexes[str(idx)] = df.loc[idx]

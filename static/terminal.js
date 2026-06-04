@@ -25,6 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
         output.scrollTop = output.scrollHeight;
     }
 
+    let currentPrompt = '>';
+
     input.addEventListener('keydown', async (e) => {
         if (e.key === 'Enter') {
             const cmd = input.value.trim();
@@ -35,12 +37,29 @@ document.addEventListener('DOMContentLoaded', () => {
             historyIdx = history.length;
 
             // Print prompt
-            printTerminal(`> ${cmd}`);
+            printTerminal(`${currentPrompt} ${cmd}`);
             input.value = '';
 
             // Handle client-side commands
             if (cmd.toLowerCase() === 'clear') {
                 output.innerHTML = '';
+                return;
+            } else if (cmd.toLowerCase() === 'panic' || cmd.toLowerCase() === '/panic') {
+                input.disabled = true;
+                const origBg = document.body.style.backgroundColor;
+                document.body.style.backgroundColor = '#5c0000';
+                
+                let chaoticText = setInterval(() => {
+                    printTerminal(Math.random().toString(36).substring(2, 15).toUpperCase() + ' ALARM TRIGGERED', 'error');
+                }, 100);
+
+                setTimeout(() => {
+                    clearInterval(chaoticText);
+                    document.body.style.backgroundColor = origBg;
+                    input.disabled = false;
+                    input.focus();
+                    printTerminal('System restored. Liquidated all assets successfully.', 'success');
+                }, 3000);
                 return;
             }
 
@@ -65,6 +84,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     openStatementModal(data.title, data.headers, data.rows);
                 } else if (data.action === 'print') {
                     printTerminal(data.text, data.type || 'normal');
+                } else if (data.action === 'cd') {
+                    printTerminal(data.text, 'success');
+                    if (data.prompt) currentPrompt = data.prompt;
                 } else if (data.error) {
                     printTerminal(`Error: ${data.error}`, 'error');
                 } else {

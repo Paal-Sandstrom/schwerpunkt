@@ -55,14 +55,30 @@
                 {% endif %}
             </div>
             
-            <!-- Russell 3000 Chart (^RUA) -->
+            <!-- Sector Performance Heatmap -->
             <div class="chart-container" style="flex: 1; margin-bottom: 0;">
-                <div class="section-title" style="margin-top: 0; font-size: 11px; text-align: center; font-weight: bold; border-bottom: 1px solid #d3d9e8; padding-bottom: 3px;">Russell 3000 Index (^RUA)</div>
-                {% if charts.russell3000_data %}
-                    <canvas id="russell-chart" style="width: 100%; height: 200px; display: block;"></canvas>
-                {% else %}
-                    <div style="padding: 40px 0; color: #888; font-size: 11px;">Chart data unavailable</div>
-                {% endif %}
+                <div class="section-title" style="margin-top: 0; font-size: 11px; text-align: center; font-weight: bold; border-bottom: 1px solid #d3d9e8; padding-bottom: 3px;">Sector Performance (1D)</div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 5px; height: 190px;">
+                    {% if sector_performance %}
+                        {% for s in sector_performance %}
+                            {% set pct = s.pct_change %}
+                            {% if pct >= 1.5 %} {% set bg = '#005a00' %} {% set txt = '#fff' %}
+                            {% elif pct >= 0.5 %} {% set bg = '#008a00' %} {% set txt = '#fff' %}
+                            {% elif pct > 0 %} {% set bg = '#aaffaa' %} {% set txt = '#000' %}
+                            {% elif pct <= -1.5 %} {% set bg = '#8a0000' %} {% set txt = '#fff' %}
+                            {% elif pct <= -0.5 %} {% set bg = '#cc0000' %} {% set txt = '#fff' %}
+                            {% elif pct < 0 %} {% set bg = '#ffaaaa' %} {% set txt = '#000' %}
+                            {% else %} {% set bg = '#e0e0e0' %} {% set txt = '#000' %} {% endif %}
+                            
+                            <div style="background-color: {{ bg }}; color: {{ txt }}; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid #000; font-family: Tahoma, Arial, sans-serif; text-align: center; overflow: hidden; padding: 2px;">
+                                <div style="font-size: 10px; font-weight: bold; line-height: 1;">{{ s.name }}</div>
+                                <div style="font-size: 9px; font-family: 'Courier New', monospace; margin-top: 2px;">{{ "{:+.2f}%".format(pct) }}</div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="grid-column: 1 / -1; display: flex; justify-content: center; align-items: center; color: #888; font-size: 11px;">Data unavailable</div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -165,11 +181,386 @@
     </div>
 </div>
 
+<!-- Macro Economic Calendar -->
+<div class="box">
+    <div class="box-header">MACRO ECONOMIC CALENDAR (THIS WEEK)</div>
+    <div class="box-body" style="padding: 0;">
+        <table class="financial-statement" style="margin-bottom: 0;">
+            <thead>
+                <tr class="statement-header-row">
+                    <th style="width: 15%;">Date/Time</th>
+                    <th style="width: 45%;">Event</th>
+                    <th style="width: 10%; text-align: center;">Impact</th>
+                    <th style="width: 15%; text-align: right;">Actual</th>
+                    <th style="width: 15%; text-align: right;">Forecast</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if economic_calendar %}
+                    {% for event in economic_calendar %}
+                        <tr>
+                            <td class="text-bold" style="font-size: 11px;">{{ event.date }}</td>
+                            <td>{{ event.event }}</td>
+                            <td style="text-align: center;">
+                                {% if event.impact == 'High' %}
+                                    <span style="color: #fff; background-color: #cc0000; padding: 1px 4px; font-size: 10px; font-weight: bold;">HIGH</span>
+                                {% elif event.impact == 'Med' %}
+                                    <span style="color: #fff; background-color: #e68a00; padding: 1px 4px; font-size: 10px; font-weight: bold;">MED</span>
+                                {% else %}
+                                    <span style="color: #666; font-size: 10px;">LOW</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-right text-bold" style="font-family: 'Courier New', monospace;">{{ event.actual }}</td>
+                            <td class="text-right" style="font-family: 'Courier New', monospace; color: #666;">{{ event.forecast }}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center" style="color: #888; padding: 15px;">No calendar events available</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- My Research Projects -->
+<div class="box" style="border-radius: 0;">
+    <div class="box-header" style="background-color: #003366; color: white; padding: 10px 15px; cursor: pointer; text-align: left; font-weight: bold; font-family: Tahoma, Arial, sans-serif; border: 1px solid #002244; margin-bottom: 15px; font-size: 14px; text-transform: uppercase;">
+        [ RESEARCH PROJECTS ]
+    </div>
+    <div class="box-body" style="padding: 0 15px 15px 15px;">
+        {% if folders %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;">
+            {% for folder in folders %}
+                <div onclick="openFolderDossier({{ folder.id }}, '{{ folder.name }}')" style="border: 2px solid #003366; background-color: #ffffff; cursor: pointer;">
+                    <div style="background-color: #e6eaf0; padding: 10px; font-weight: bold; border-bottom: 1px solid #003366; display: flex; justify-content: space-between; align-items: center; font-family: Tahoma, Arial, sans-serif;">
+                        <span style="color: #003366; font-size: 14px;">{{ folder.name }}</span>
+                        <span style="font-size: 11px; color: #003366; background: #fff; padding: 2px 5px; border: 1px solid #003366;">{{ folder.notes|length }} NOTE{% if folder.notes|length != 1 %}S{% endif %}</span>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        {% else %}
+            <div style="padding: 30px; text-align: center; color: #003366; border: 2px solid #003366; background-color: #ffffff; font-family: Tahoma, Arial, sans-serif;">
+                <div style="font-weight: bold; margin-bottom: 5px; font-size: 14px;">[ NO RESEARCH PROJECTS ]</div>
+                <p style="margin: 0; font-size: 12px;">Create your first folder using the terminal to organize your investment thesis.</p>
+                <div style="margin-top: 15px; font-family: 'Courier New', monospace; background-color: #000000; color: #00ff00; padding: 5px 10px; display: inline-block; border: 1px solid #333;">
+                    > mkdir tech-stocks
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Folder Dossier Modal -->
+<div id="folder-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: transparent; z-index: 1000; justify-content: center; align-items: center; font-family: Tahoma, Arial, sans-serif;">
+    <!-- Pseudo-window background overlay to dim but not blur -->
+    <div style="position: absolute; width: 100%; height: 100%; background: #000; opacity: 0.5;"></div>
+    
+    <div style="background: #e6eaf0; border: 2px solid #003366; width: 90%; max-width: 800px; height: 80%; display: flex; flex-direction: column; overflow: hidden; z-index: 1001; box-shadow: 5px 5px 0px rgba(0,0,0,0.2);">
+        <div style="background: #003366; color: white; padding: 5px 10px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 14px;">
+            <span id="folder-modal-title">[ FOLDER NAME ]</span>
+            <button onclick="closeFolderDossier()" style="background: #e6eaf0; border: 1px solid #003366; color: #003366; font-size: 12px; font-weight: bold; cursor: pointer; padding: 2px 6px;">X</button>
+        </div>
+        <div style="display: flex; background: #d3d9e8; border-bottom: 2px solid #003366;">
+            <button onclick="switchFolderTab('notes')" id="tab-btn-notes" style="flex: 1; padding: 8px; border: 1px solid #003366; border-bottom: none; background: #e6eaf0; font-weight: bold; cursor: pointer; color: #003366; font-family: Tahoma, Arial, sans-serif; font-size: 12px;">NOTES</button>
+            <button onclick="switchFolderTab('sheet')" id="tab-btn-sheet" style="flex: 1; padding: 8px; border: 1px solid #003366; border-bottom: none; background: #d3d9e8; font-weight: bold; cursor: pointer; color: #555; font-family: Tahoma, Arial, sans-serif; font-size: 12px;">SPREADSHEET</button>
+        </div>
+        <div style="flex: 1; overflow-y: auto; position: relative; background: #ffffff;">
+            <div id="folder-tab-notes" style="padding: 15px;">
+                <div id="folder-notes-container">Loading...</div>
+            </div>
+            <div id="folder-tab-sheet" style="padding: 15px; display: none;">
+                <div style="margin-bottom: 10px; font-size: 11px; color: #003366; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+                    <span>Numerical scratchpad. Auto-saves on blur.</span>
+                    <div>
+                        <button onclick="zoomSheet(-1)" style="padding: 2px 6px; cursor: pointer;">-</button>
+                        <span id="sheet-zoom-level" style="margin: 0 5px;">100%</span>
+                        <button onclick="zoomSheet(1)" style="padding: 2px 6px; cursor: pointer;">+</button>
+                        <span id="sheet-save-status" style="color: #008800; font-weight: bold; display: none; margin-left: 10px;">[SAVED]</span>
+                    </div>
+                </div>
+                <div style="overflow: auto; border: 2px solid #003366; background: #fff; max-height: 60vh;">
+                    <table id="folder-spreadsheet" style="border-collapse: collapse; min-width: 600px; transform-origin: top left; transition: transform 0.2s;">
+                        <!-- JS will generate grid -->
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .sheet-cell {
+        border: 1px solid #d3d9e8;
+        padding: 8px;
+        min-width: 80px;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        outline: none;
+        transition: background 0.2s;
+    }
+    .sheet-cell:focus {
+        background: #f0f7ff;
+        border: 1px solid #003366;
+    }
+    .sheet-header {
+        background: #e6eaf0;
+        font-weight: bold;
+        text-align: center;
+        color: #555;
+        border: 1px solid #d3d9e8;
+        padding: 5px;
+    }
+</style>
+
 <script>
+    let currentFolderId = null;
+
+    function switchFolderTab(tab) {
+        document.getElementById('folder-tab-notes').style.display = tab === 'notes' ? 'block' : 'none';
+        document.getElementById('folder-tab-sheet').style.display = tab === 'sheet' ? 'block' : 'none';
+        
+        document.getElementById('tab-btn-notes').style.background = tab === 'notes' ? '#e6eaf0' : '#d3d9e8';
+        document.getElementById('tab-btn-notes').style.color = tab === 'notes' ? '#003366' : '#555';
+
+        document.getElementById('tab-btn-sheet').style.background = tab === 'sheet' ? '#e6eaf0' : '#d3d9e8';
+        document.getElementById('tab-btn-sheet').style.color = tab === 'sheet' ? '#003366' : '#555';
+    }
+
+    function closeFolderDossier() {
+        document.getElementById('folder-modal').style.display = 'none';
+    }
+
+    async function openFolderDossier(folderId, folderName) {
+        currentFolderId = folderId;
+        document.getElementById('folder-modal-title').innerHTML = `[ ${folderName.toUpperCase()} ]`;
+        document.getElementById('folder-modal').style.display = 'flex';
+        switchFolderTab('notes');
+        document.getElementById('folder-notes-container').innerHTML = 'Loading data...';
+
+        try {
+            const res = await fetch(`/api/folder/${folderId}/data`);
+            const data = await res.json();
+            if (data.success) {
+                renderNotes(data.notes);
+                renderSpreadsheet(data.cells);
+            } else {
+                document.getElementById('folder-notes-container').innerHTML = `<div style="color: red;">Error: ${data.error}</div>`;
+            }
+        } catch (e) {
+            document.getElementById('folder-notes-container').innerHTML = `<div style="color: red;">Connection error.</div>`;
+        }
+    }
+
+    function renderNotes(notes) {
+        const container = document.getElementById('folder-notes-container');
+        if (!notes || notes.length === 0) {
+            container.innerHTML = '<div style="color: #888; font-style: italic; text-align: center; padding: 40px 0;">No notes found in this dossier.<br><br>Use `note <text>` in the terminal.</div>';
+            return;
+        }
+
+        let html = '';
+        notes.forEach(note => {
+            let badge = '';
+            if (note.sentiment === 'bullish') {
+                badge = `<span style="color: #008800; font-weight: bold; font-size: 11px; padding: 2px 4px; border: 1px solid #008800; background: #e6f4ea;">[ BULLISH ]</span>`;
+            } else if (note.sentiment === 'bearish') {
+                badge = `<span style="color: #cc0000; font-weight: bold; font-size: 11px; padding: 2px 4px; border: 1px solid #cc0000; background: #fce8e6;">[ BEARISH ]</span>`;
+            }
+
+            let priceStr = '';
+            if (note.price_at_creation) {
+                priceStr = `<div style="margin-top: 8px; font-size: 11px; color: #003366; font-family: 'Courier New', monospace; background-color: #e6eaf0; padding: 4px; border: 1px solid #d3d9e8; display: inline-block;">REF PRICE: $${parseFloat(note.price_at_creation).toFixed(2)}</div>`;
+            }
+
+            let parsedContent = note.content.replace(/\$([A-Za-z]+)/g, '<a href="/ticker/$1" style="color: #003366; font-weight: bold; text-decoration: underline;">$$$1</a>');
+
+            html += `
+                <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #003366; background: #fafbfc;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; border-bottom: 1px dotted #003366; padding-bottom: 5px;">
+                        <span style="color: #003366; font-size: 13px; font-family: Tahoma, Arial, sans-serif; font-weight: bold;">${note.title}</span>
+                        <div>
+                            <span style="color: #555; font-size: 10px; font-family: 'Courier New', monospace; margin-right: 10px;">NOTE #${note.id} | ${note.created_at}</span>
+                            ${badge}
+                        </div>
+                    </div>
+                    <div style="font-size: 12px; line-height: 1.4; color: #333; font-family: Tahoma, Arial, sans-serif;">
+                        ${parsedContent}
+                    </div>
+                    ${priceStr}
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    let currentZoom = 1;
+    function zoomSheet(direction) {
+        currentZoom += direction * 0.1;
+        if (currentZoom < 0.5) currentZoom = 0.5;
+        if (currentZoom > 2) currentZoom = 2;
+        document.getElementById('folder-spreadsheet').style.transform = `scale(${currentZoom})`;
+        document.getElementById('sheet-zoom-level').textContent = `${Math.round(currentZoom * 100)}%`;
+    }
+
+    let currentSheetData = {};
+
+    function evaluateFormula(raw, map, evalSet = new Set(), currentCellId = "") {
+        if (!raw || !raw.toString().startsWith('=')) return raw;
+        
+        let expr = raw.toString().substring(1).toUpperCase();
+        
+        if (currentCellId && evalSet.has(currentCellId)) return '#REF!';
+        if (currentCellId) evalSet.add(currentCellId);
+        
+        expr = expr.replace(/([A-Z])([0-9]+)/g, (match, colLetter, rowStr) => {
+            let c_ref = colLetter.charCodeAt(0) - 65;
+            let r_ref = parseInt(rowStr) - 1;
+            let refId = `${r_ref}-${c_ref}`;
+            let refRaw = map[refId] || "0";
+            let val = evaluateFormula(refRaw, map, evalSet, refId);
+            let parsed = parseFloat(val);
+            return isNaN(parsed) ? 0 : parsed;
+        });
+        
+        if (currentCellId) evalSet.delete(currentCellId);
+        
+        try {
+            if (!/^[0-9+\-*/().\s]+$/.test(expr)) return '#ERROR!';
+            let result = new Function('return ' + expr)();
+            return Math.round(result * 10000) / 10000;
+        } catch (e) {
+            return '#ERROR!';
+        }
+    }
+
+    function reevaluateAllCells() {
+        const ROWS = 20;
+        const COLS = 26;
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                let td = document.getElementById(`cell-${r}-${c}`);
+                if (td && document.activeElement !== td) {
+                    let raw = currentSheetData[`${r}-${c}`] || '';
+                    if (raw.toString().startsWith('=')) {
+                        td.textContent = evaluateFormula(raw, currentSheetData, new Set(), `${r}-${c}`);
+                    } else {
+                        td.textContent = raw;
+                    }
+                }
+            }
+        }
+    }
+
+    function renderSpreadsheet(cellsData) {
+        const table = document.getElementById('folder-spreadsheet');
+        table.innerHTML = '';
+        
+        // Build map for quick lookup
+        currentSheetData = {};
+        if (cellsData) {
+            cellsData.forEach(c => {
+                currentSheetData[`${c.row_idx}-${c.col_idx}`] = c.value;
+            });
+        }
+
+        const ROWS = 20;
+        const COLS = 26; // A to Z
+
+        // Header row
+        let thead = '<tr><th class="sheet-header" style="width: 40px;"></th>';
+        for (let c = 0; c < COLS; c++) {
+            thead += `<th class="sheet-header">${String.fromCharCode(65 + c)}</th>`;
+        }
+        thead += '</tr>';
+        table.innerHTML += thead;
+
+        // Body rows
+        for (let r = 0; r < ROWS; r++) {
+            let tr = document.createElement('tr');
+            let th = document.createElement('td');
+            th.className = 'sheet-header';
+            th.textContent = r + 1;
+            tr.appendChild(th);
+
+            for (let c = 0; c < COLS; c++) {
+                let td = document.createElement('td');
+                td.className = 'sheet-cell';
+                td.contentEditable = true;
+                td.id = `cell-${r}-${c}`;
+                
+                let raw = currentSheetData[`${r}-${c}`] || '';
+                td.textContent = raw.toString().startsWith('=') ? evaluateFormula(raw, currentSheetData, new Set(), `${r}-${c}`) : raw;
+                
+                td.addEventListener('focus', () => {
+                    td.textContent = currentSheetData[`${r}-${c}`] || '';
+                });
+
+                td.addEventListener('blur', () => {
+                    let val = td.textContent.trim();
+                    currentSheetData[`${r}-${c}`] = val;
+                    if (val.startsWith('=')) {
+                        td.textContent = evaluateFormula(val, currentSheetData, new Set(), `${r}-${c}`);
+                    }
+                    reevaluateAllCells(); // Update dependencies
+                    saveCell(r, c, val);
+                });
+
+                td.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        td.blur();
+                        // Move down
+                        let next = document.getElementById(`cell-${r+1}-${c}`);
+                        if (next) next.focus();
+                    } else if (e.key === 'ArrowUp') {
+                        let next = document.getElementById(`cell-${r-1}-${c}`);
+                        if (next) { e.preventDefault(); next.focus(); }
+                    } else if (e.key === 'ArrowDown') {
+                        let next = document.getElementById(`cell-${r+1}-${c}`);
+                        if (next) { e.preventDefault(); next.focus(); }
+                    } else if (e.key === 'ArrowLeft') {
+                        let sel = window.getSelection();
+                        if (sel.anchorOffset === 0) {
+                            let next = document.getElementById(`cell-${r}-${c-1}`);
+                            if (next) { e.preventDefault(); next.focus(); }
+                        }
+                    } else if (e.key === 'ArrowRight') {
+                        let sel = window.getSelection();
+                        if (sel.anchorOffset === td.textContent.length) {
+                            let next = document.getElementById(`cell-${r}-${c+1}`);
+                            if (next) { e.preventDefault(); next.focus(); }
+                        }
+                    }
+                });
+
+                tr.appendChild(td);
+            }
+            table.appendChild(tr);
+        }
+    }
+
+    async function saveCell(row, col, value) {
+        if (!currentFolderId) return;
+        try {
+            await fetch(`/api/folder/${currentFolderId}/spreadsheet`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ row, col, value })
+            });
+            const status = document.getElementById('sheet-save-status');
+            status.style.display = 'inline-block';
+            setTimeout(() => { status.style.display = 'none'; }, 1500);
+        } catch (e) {
+            console.error('Save failed', e);
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         const spData = {{ charts.sp500_data | tojson | safe }};
         const ruaData = {{ charts.russell3000_data | tojson | safe }};
-        
         if (spData && spData.length) {
             new StockChart(document.getElementById('sp500-chart'), spData);
         }

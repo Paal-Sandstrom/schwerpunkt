@@ -535,8 +535,8 @@
                             <input type="hidden" name="view" value="dcf">
                             
                             <div class="dcf-form-group">
-                                <label>Base FCF (Last Yr)</label>
-                                <input type="text" value="{{ dcf_results.fcf_base_formatted }}" disabled style="background-color: #e9ebee; text-align: right;">
+                                <div class="dcf-form-label">Base Year FCF (TTM)</div>
+                                <input type="number" name="fcf_base" step="any" value="{{ dcf_params.fcf_base | default(data.dcf_raw.fcf_base) }}" class="dcf-form-cell" required>
                             </div>
                             
                             <div class="dcf-form-group">
