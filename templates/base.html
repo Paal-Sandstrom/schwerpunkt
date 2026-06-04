@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Schwerpunkt - Equity Research Terminal{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='chart.js') }}"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Unified Web Header (Early Facebook/Web 2.0 Style) -->
+        <header class="web-header">
+            <a href="{{ url_for('index') }}" class="web-logo-block">
+                <span class="web-logo-icon">📊</span>
+                <span class="web-logo-text">Schwerpunkt</span>
+            </a>
+            
+            <nav class="web-nav">
+                {% if request.path != '/' and request.path != '/index' %}
+                    <a href="{{ url_for('index') }}" class="web-nav-link">Market Home</a>
+                {% else %}
+                    <span class="web-nav-link active">Market Home</span>
+                {% endif %}
+                <a href="{{ url_for('index_constituents', index_id='sp500') }}" class="web-nav-link {% if request.path.startswith('/index-constituents/') %}active{% endif %}">Watchlists</a>
+            </nav>
+
+            <div class="web-search-box">
+                <form action="{{ url_for('query_ticker') }}" method="POST" style="display: flex; align-items: center;" id="search-form">
+                    <input type="text" id="ticker-input" name="symbol" placeholder="Search Ticker (e.g., AAPL, MSFT, NVDA)..." class="web-search-input" required autocomplete="off">
+                    <button type="submit" class="web-search-btn">Query</button>
+                </form>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="app-content">
+            <!-- Flash Message Alerts -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="error-box">
+                            <div class="error-title">SYSTEM NOTICE</div>
+                            <div>{{ message }}</div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+
+        <!-- Web Footer -->
+        <footer class="web-footer">
+            <div class="web-footer-left">
+                <span>© 2004-2026 Schwerpunkt Stock Terminal. All rights reserved.</span>
+                <span style="color: #ccc; margin: 0 6px;">|</span>
+                <span>Connection: <b>SECURE</b></span>
+            </div>
+            <div class="web-footer-right">
+                <span>Load Time: <b>{{ query_time }}</b></span>
+                <span style="color: #ccc; margin: 0 6px;">|</span>
+                <span>Zone: <b>Local Intranet</b></span>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

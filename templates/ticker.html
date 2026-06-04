@@ -1,0 +1,686 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ symbol }} - {{ snapshot.name }} Report - Schwerpunkt{% endblock %}
+
+{% block content %}
+<!-- Ticker Header Section -->
+<div class="box" style="margin-bottom: 12px;">
+    <div class="box-body" style="padding: 15px;">
+        <div class="ticker-title-block">
+            <div>
+                <span class="ticker-name">{{ snapshot.name }}</span>
+                <span class="ticker-symbol">({{ snapshot.symbol }} : NASDAQ/NYSE)</span>
+                <div style="font-size: 11px; color: #666; margin-top: 4px;">
+                    Sector: <span class="text-bold">{{ snapshot.sector }}</span> | Industry: <span class="text-bold">{{ snapshot.industry }}</span>
+                </div>
+            </div>
+            <div class="ticker-price-badge">
+                <div class="ticker-price-large">{{ snapshot.price_formatted }}</div>
+                <div style="font-size: 11px; margin-top: 3px;" class="{% if snapshot.change >= 0 %}text-green{% else %}text-red{% endif %}">
+                    {{ snapshot.change_formatted }} ({{ snapshot.change_pct_formatted }})
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Metrics Cards Row (Nichirei Style - Replaced Target Price with P/E Ratio) -->
+<div class="metrics-grid" style="margin-bottom: 15px;">
+    <div class="metric-card">
+        <div class="metric-label">MARKET CAP</div>
+        <div class="metric-value">{{ metrics.market_cap }}</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">FCF YIELD</div>
+        <div class="metric-value">{{ metrics.fcf_yield }}</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">CURRENT PRICE</div>
+        <div class="metric-value" style="color: #3b5998;">{{ metrics.current_price }}</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">P/E RATIO</div>
+        <div class="metric-value" style="color: #008800;">{{ metrics.pe_ratio }}</div>
+    </div>
+</div>
+
+<!-- Sub-View Navigation Tabs (Overview, Financials, DCF) -->
+<div class="subview-tabs">
+    <a href="{{ url_for('ticker_detail', symbol=symbol, view='overview') }}" class="subview-tab-item {% if view == 'overview' %}active{% endif %}">Overview</a>
+    <a href="{{ url_for('ticker_detail', symbol=symbol, view='financials') }}" class="subview-tab-item {% if view == 'financials' %}active{% endif %}">Financial Statements</a>
+    <a href="{{ url_for('ticker_detail', symbol=symbol, view='dcf') }}" class="subview-tab-item {% if view == 'dcf' %}active{% endif %}">DCF Valuation</a>
+</div>
+
+<!-- Main Split Body Layout -->
+<div class="layout-split">
+    
+    <!-- Left Column Content (Changes dynamically depending on active tab) -->
+    <div class="layout-col-main">
+        
+        <!-- ========================================== -->
+        <!-- VIEW: OVERVIEW (Profile and History Chart) -->
+        <!-- ========================================== -->
+        {% if view == 'overview' %}
+            <!-- Profile Description Box -->
+            <div class="box">
+                <div class="box-header">COMPANY OVERVIEW</div>
+                <div class="box-body" style="padding: 15px;">
+                    <div class="section-title" style="margin-top: 0;">The Business</div>
+                    <p class="text-block">
+                        {{ snapshot.summary }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Historical Performance Chart Box -->
+            <div class="box">
+                <div class="box-header">HISTORICAL PERFORMANCE CHART</div>
+                <div class="tab-bar">
+                    <a href="{{ url_for('ticker_detail', symbol=symbol, view='overview', period='1mo') }}" class="tab-item {% if period == '1mo' %}active{% endif %}">1M</a>
+                    <a href="{{ url_for('ticker_detail', symbol=symbol, view='overview', period='3mo') }}" class="tab-item {% if period == '3mo' %}active{% endif %}">3M</a>
+                    <a href="{{ url_for('ticker_detail', symbol=symbol, view='overview', period='6mo') }}" class="tab-item {% if period == '6mo' %}active{% endif %}">6M</a>
+                    <a href="{{ url_for('ticker_detail', symbol=symbol, view='overview', period='1y') }}" class="tab-item {% if period == '1y' %}active{% endif %}">1Y</a>
+                    <a href="{{ url_for('ticker_detail', symbol=symbol, view='overview', period='5y') }}" class="tab-item {% if period == '5y' %}active{% endif %}">5Y</a>
+                    <a href="{{ url_for('ticker_detail', symbol=symbol, view='overview', period='max') }}" class="tab-item {% if period == 'max' %}active{% endif %}">All Time</a>
+                </div>
+                <div class="box-body" style="background-color: #ffffff; text-align: center; padding: 15px;">
+                    {% if chart_data %}
+                        <canvas id="ticker-chart" style="width: 100%; height: 320px; display: block;"></canvas>
+                    {% else %}
+                        <div style="padding: 50px 0; color: #888; font-size: 12px;">
+                            Error: Unable to generate historical chart for ticker {{ symbol }}.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+        <!-- ========================================== -->
+        <!-- VIEW: FINANCIAL STATEMENTS                 -->
+        <!-- ========================================== -->
+        {% elif view == 'financials' %}
+            
+            <!-- Financial Statement Type Selector Tabs (Client-side Switching) -->
+            <div class="tab-bar">
+                <button type="button" id="stmt-tab-income" class="tab-item active" onclick="switchStatement('income')">Income Statement</button>
+                <button type="button" id="stmt-tab-balance" class="tab-item" onclick="switchStatement('balance')">Balance Sheet</button>
+                <button type="button" id="stmt-tab-cashflow" class="tab-item" onclick="switchStatement('cashflow')">Cash Flow Statement</button>
+            </div>
+
+            <!-- Real-time Row Search Filter Box -->
+            <div class="line-filter-container">
+                <span class="line-filter-label">FILTER LINE ITEMS:</span>
+                <input type="text" id="financial-row-filter" class="line-filter-input" onkeyup="filterFinancialLines()" placeholder="Type to search line items (e.g. Cash, Revenue)..." autocomplete="off">
+            </div>
+
+            <!-- Sub-section Filter Links Bar (Balance Sheet) -->
+            <div class="section-filter-bar" id="balance-section-filters" style="display: none;">
+                <span class="section-filter-label">SHOW SECTION:</span>
+                <span class="section-filter-item active" data-section="all" onclick="filterBalanceSection('all', this)">All Sections</span>
+                <span class="section-filter-item" data-section="assets" onclick="filterBalanceSection('assets', this)">1. Assets</span>
+                <span class="section-filter-item" data-section="liabilities" onclick="filterBalanceSection('liabilities', this)">2. Liabilities</span>
+                <span class="section-filter-item" data-section="equity" onclick="filterBalanceSection('equity', this)">3. Owner's Equity</span>
+            </div>
+
+            <!-- Sub-section Filter Links Bar (Cash Flow) -->
+            <div class="section-filter-bar" id="cashflow-section-filters" style="display: none;">
+                <span class="section-filter-label">SHOW SECTION:</span>
+                <span class="section-filter-item active" data-section="all" onclick="filterCashflowSection('all', this)">All Sections</span>
+                <span class="section-filter-item" data-section="operating" onclick="filterCashflowSection('operating', this)">1. Operating Cash Flow</span>
+                <span class="section-filter-item" data-section="investing" onclick="filterCashflowSection('investing', this)">2. Investing Cash Flow</span>
+                <span class="section-filter-item" data-section="financing" onclick="filterCashflowSection('financing', this)">3. Financing Cash Flow</span>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- SUB-VIEW: INCOME STATEMENT                 -->
+            <!-- ========================================== -->
+            <div id="stmt-panel-income" class="financials-panel box" style="display: block;">
+                <div class="box-header">INCOME STATEMENT (ANNUAL - 3-YEAR VIEW)</div>
+                <div class="box-body">
+                    {% if statements.income_stmt %}
+                        <div class="financials-wrapper">
+                            <table class="data-table" id="table-income">
+                                <thead>
+                                    <tr class="statement-header-row">
+                                        <th>Financial Line Item</th>
+                                        {% for col in statements.income_stmt.columns %}
+                                            <th class="text-right">{{ col }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in statements.income_stmt.rows %}
+                                        <tr class="financial-row {% if row.is_category_header %}category-header-row{% elif row.is_major_total %}row-major-total{% elif row.is_summary %}row-summary{% else %}row-child data-table-striped{% endif %}">
+                                            {% if row.is_category_header %}
+                                                <td colspan="{{ statements.income_stmt.columns|length + 1 }}" style="padding-left: 10px;">{{ row.label }}</td>
+                                            {% else %}
+                                                <td class="row-label">{{ row.label }}</td>
+                                                {% for val in row['values'] %}
+                                                    <td class="text-right">{{ val }}</td>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p style="padding: 15px 5px; color: #777;">Income statement is currently unavailable for this stock ticker.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- SUB-VIEW: BALANCE SHEET                    -->
+            <!-- ========================================== -->
+            <div id="stmt-panel-balance" class="financials-panel box" style="display: none;">
+                <div class="box-header">BALANCE SHEET (ANNUAL - 3-YEAR VIEW)</div>
+                <div class="box-body">
+                    {% if statements.balance_sheet %}
+                        <div class="financials-wrapper">
+                            <table class="data-table" id="table-balance">
+                                <thead>
+                                    <tr class="statement-header-row">
+                                        <th>Financial Line Item</th>
+                                        {% for col in statements.balance_sheet.columns %}
+                                            <th class="text-right">{{ col }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                
+                                <!-- ASSETS SECTION -->
+                                <tbody id="sec-assets">
+                                    <tr class="category-header-row">
+                                        <td colspan="{{ statements.balance_sheet.columns|length + 1 }}">1. ASSETS</td>
+                                    </tr>
+                                    {% for row in statements.balance_sheet.assets %}
+                                        <tr class="financial-row {% if row.is_sub_header %}category-header-row{% elif row.label.lower() == 'total assets' %}total-assets-row row-major-total{% elif row.is_major_total %}row-major-total{% elif row.is_summary %}row-summary{% else %}row-child data-table-striped{% endif %}">
+                                            {% if row.is_sub_header %}
+                                                <td colspan="{{ statements.balance_sheet.columns|length + 1 }}" style="padding-left: 15px; font-style: italic;">{{ row.label }}</td>
+                                            {% else %}
+                                                <td class="row-label">{{ row.label }}</td>
+                                                {% for val in row['values'] %}
+                                                    <td class="text-right">{{ val }}</td>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+
+                                <!-- LIABILITIES SECTION -->
+                                <tbody id="sec-liabilities">
+                                    <tr class="category-header-row">
+                                        <td colspan="{{ statements.balance_sheet.columns|length + 1 }}">2. LIABILITIES</td>
+                                    </tr>
+                                    {% for row in statements.balance_sheet.liabilities %}
+                                        <tr class="financial-row {% if row.is_sub_header %}category-header-row{% elif 'total liabilities' in row.label.lower() %}total-liabilities-row row-major-total{% elif row.is_major_total %}row-major-total{% elif row.is_summary %}row-summary{% else %}row-child data-table-striped{% endif %}">
+                                            {% if row.is_sub_header %}
+                                                <td colspan="{{ statements.balance_sheet.columns|length + 1 }}" style="padding-left: 15px; font-style: italic;">{{ row.label }}</td>
+                                            {% else %}
+                                                <td class="row-label">{{ row.label }}</td>
+                                                {% for val in row['values'] %}
+                                                    <td class="text-right">{{ val }}</td>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+
+                                <!-- STOCKHOLDERS' EQUITY SECTION -->
+                                <tbody id="sec-equity">
+                                    <tr class="category-header-row">
+                                        <td colspan="{{ statements.balance_sheet.columns|length + 1 }}">3. STOCKHOLDERS' EQUITY</td>
+                                    </tr>
+                                    {% for row in statements.balance_sheet.equity %}
+                                        <tr class="financial-row {% if row.is_sub_header %}category-header-row{% elif 'total equity' in row.label.lower() or 'stockholders equity' in row.label.lower() %}total-equity-row row-major-total{% elif row.is_major_total %}row-major-total{% elif row.is_summary %}row-summary{% else %}row-child data-table-striped{% endif %}">
+                                            {% if row.is_sub_header %}
+                                                <td colspan="{{ statements.balance_sheet.columns|length + 1 }}" style="padding-left: 15px; font-style: italic;">{{ row.label }}</td>
+                                            {% else %}
+                                                <td class="row-label">{{ row.label }}</td>
+                                                {% for val in row['values'] %}
+                                                    <td class="text-right">{{ val }}</td>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p style="padding: 15px 5px; color: #777;">Balance sheet is currently unavailable for this stock ticker.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- SUB-VIEW: CASH FLOW STATEMENT              -->
+            <!-- ========================================== -->
+            <div id="stmt-panel-cashflow" class="financials-panel box" style="display: none;">
+                <div class="box-header">CASH FLOW STATEMENT (ANNUAL - 3-YEAR VIEW)</div>
+                <div class="box-body">
+                    {% if statements.cashflow %}
+                        <div class="financials-wrapper">
+                            <table class="data-table" id="table-cashflow">
+                                <thead>
+                                    <tr class="statement-header-row">
+                                        <th>Financial Line Item</th>
+                                        {% for col in statements.cashflow.columns %}
+                                            <th class="text-right">{{ col }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                
+                                <!-- OPERATING ACTIVITIES SECTION -->
+                                <tbody id="sec-operating">
+                                    <tr class="category-header-row">
+                                        <td colspan="{{ statements.cashflow.columns|length + 1 }}">1. CASH FLOW FROM OPERATING ACTIVITIES</td>
+                                    </tr>
+                                    {% for row in statements.cashflow.operating %}
+                                        <tr class="financial-row {% if 'operating cash flow' in row.label.lower() or 'cash flow from operating' in row.label.lower() %}total-equity-row row-major-total{% elif row.is_major_total %}row-major-total{% elif row.is_summary %}row-summary{% else %}row-child data-table-striped{% endif %}">
+                                            <td class="row-label">{{ row.label }}</td>
+                                            {% for val in row['values'] %}
+                                                <td class="text-right">{{ val }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+
+                                <!-- INVESTING ACTIVITIES SECTION -->
+                                <tbody id="sec-investing">
+                                    <tr class="category-header-row">
+                                        <td colspan="{{ statements.cashflow.columns|length + 1 }}">2. CASH FLOW FROM INVESTING ACTIVITIES</td>
+                                    </tr>
+                                    {% for row in statements.cashflow.investing %}
+                                        <tr class="financial-row {% if 'investing cash flow' in row.label.lower() or 'cash flow from investing' in row.label.lower() %}total-equity-row row-major-total{% elif row.is_major_total %}row-major-total{% elif row.is_summary %}row-summary{% else %}row-child data-table-striped{% endif %}">
+                                            <td class="row-label">{{ row.label }}</td>
+                                            {% for val in row['values'] %}
+                                                <td class="text-right">{{ val }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+
+                                <!-- FINANCING ACTIVITIES SECTION -->
+                                <tbody id="sec-financing">
+                                    <tr class="category-header-row">
+                                        <td colspan="{{ statements.cashflow.columns|length + 1 }}">3. CASH FLOW FROM FINANCING ACTIVITIES</td>
+                                    </tr>
+                                    {% for row in statements.cashflow.financing %}
+                                        <tr class="financial-row {% if 'financing cash flow' in row.label.lower() or 'cash flow from financing' in row.label.lower() %}total-equity-row row-major-total{% elif row.is_major_total %}row-major-total{% elif row.is_summary %}row-summary{% else %}row-child data-table-striped{% endif %}">
+                                            <td class="row-label">{{ row.label }}</td>
+                                            {% for val in row['values'] %}
+                                                <td class="text-right">{{ val }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+
+                                <!-- RECONCILIATION SECTION -->
+                                <tbody id="sec-reconciliation">
+                                    <tr class="category-header-row">
+                                        <td colspan="{{ statements.cashflow.columns|length + 1 }}">4. CASH RECONCILIATION</td>
+                                    </tr>
+                                    {% for row in statements.cashflow.reconciliation %}
+                                        <tr class="financial-row {% if 'end cash position' in row.label.lower() %}total-equity-row row-major-total{% else %}row-summary{% endif %}">
+                                            <td class="row-label">{{ row.label }}</td>
+                                            {% for val in row['values'] %}
+                                                <td class="text-right">{{ val }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p style="padding: 15px 5px; color: #777;">Cash flow statement is currently unavailable for this stock ticker.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <script>
+                // Switches between main statement tabs
+                function switchStatement(stmtType) {
+                    // Toggle active button state in statement tabs
+                    document.querySelectorAll('.tab-bar .tab-item').forEach(btn => {
+                        if (btn.id.startsWith('stmt-tab-')) {
+                            btn.classList.remove('active');
+                        }
+                    });
+                    const activeBtn = document.getElementById('stmt-tab-' + stmtType);
+                    if (activeBtn) activeBtn.classList.add('active');
+
+                    // Toggle statement panel visibility
+                    document.querySelectorAll('.financials-panel').forEach(panel => {
+                        panel.style.display = 'none';
+                    });
+                    const activePanel = document.getElementById('stmt-panel-' + stmtType);
+                    if (activePanel) activePanel.style.display = 'block';
+
+                    // Toggle sub-section filters bar visibility
+                    const balFilters = document.getElementById('balance-section-filters');
+                    const cfFilters = document.getElementById('cashflow-section-filters');
+                    
+                    if (balFilters) balFilters.style.display = (stmtType === 'balance') ? 'flex' : 'none';
+                    if (cfFilters) cfFilters.style.display = (stmtType === 'cashflow') ? 'flex' : 'none';
+
+                    // Clear row filter and re-apply view constraint
+                    document.getElementById('financial-row-filter').value = '';
+                    
+                    if (stmtType === 'balance') {
+                        // Re-apply current active Balance section filter
+                        const activeBalItem = document.querySelector('#balance-section-filters .section-filter-item.active');
+                        if (activeBalItem) {
+                            filterBalanceSection(activeBalItem.getAttribute('data-section'), activeBalItem);
+                        }
+                    } else if (stmtType === 'cashflow') {
+                        // Re-apply current active Cashflow section filter
+                        const activeCfItem = document.querySelector('#cashflow-section-filters .section-filter-item.active');
+                        if (activeCfItem) {
+                            filterCashflowSection(activeCfItem.getAttribute('data-section'), activeCfItem);
+                        }
+                    } else {
+                        // Show all rows for Income Statement
+                        const incomeRows = document.querySelectorAll('#table-income .financial-row');
+                        incomeRows.forEach(row => {
+                            row.style.display = '';
+                        });
+                    }
+                }
+
+                // Handles Balance Sheet sub-section filtering (Assets, Liabilities, Equity)
+                function filterBalanceSection(sectionType, element) {
+                    // Highlight active link
+                    document.querySelectorAll('#balance-section-filters .section-filter-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    element.classList.add('active');
+
+                    const secAssets = document.getElementById('sec-assets');
+                    const secLiabilities = document.getElementById('sec-liabilities');
+                    const secEquity = document.getElementById('sec-equity');
+
+                    if (!secAssets || !secLiabilities || !secEquity) return;
+
+                    // Reset display
+                    secAssets.style.display = '';
+                    secLiabilities.style.display = '';
+                    secEquity.style.display = '';
+
+                    if (sectionType === 'assets') {
+                        secLiabilities.style.display = 'none';
+                        secEquity.style.display = 'none';
+                    } else if (sectionType === 'liabilities') {
+                        secAssets.style.display = 'none';
+                        secEquity.style.display = 'none';
+                    } else if (sectionType === 'equity') {
+                        secAssets.style.display = 'none';
+                        secLiabilities.style.display = 'none';
+                    }
+                    
+                    // Re-apply text row filter
+                    filterFinancialLines();
+                }
+
+                // Handles Cash Flow Statement sub-section filtering (Operating, Investing, Financing)
+                function filterCashflowSection(sectionType, element) {
+                    // Highlight active link
+                    document.querySelectorAll('#cashflow-section-filters .section-filter-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    element.classList.add('active');
+
+                    const secOperating = document.getElementById('sec-operating');
+                    const secInvesting = document.getElementById('sec-investing');
+                    const secFinancing = document.getElementById('sec-financing');
+                    const secReconciliation = document.getElementById('sec-reconciliation');
+
+                    if (!secOperating || !secInvesting || !secFinancing || !secReconciliation) return;
+
+                    // Reset display
+                    secOperating.style.display = '';
+                    secInvesting.style.display = '';
+                    secFinancing.style.display = '';
+                    secReconciliation.style.display = '';
+
+                    if (sectionType === 'operating') {
+                        secInvesting.style.display = 'none';
+                        secFinancing.style.display = 'none';
+                        secReconciliation.style.display = 'none';
+                    } else if (sectionType === 'investing') {
+                        secOperating.style.display = 'none';
+                        secFinancing.style.display = 'none';
+                        secReconciliation.style.display = 'none';
+                    } else if (sectionType === 'financing') {
+                        secOperating.style.display = 'none';
+                        secInvesting.style.display = 'none';
+                        secReconciliation.style.display = 'none';
+                    }
+                    
+                    // Re-apply text row filter
+                    filterFinancialLines();
+                }
+
+                // Handles real-time search filtering on table rows
+                function filterFinancialLines() {
+                    const query = document.getElementById('financial-row-filter').value.toLowerCase().trim();
+                    
+                    // Find which statement panel is active
+                    let activeTableId = '';
+                    if (document.getElementById('stmt-panel-income').style.display !== 'none') {
+                        activeTableId = 'table-income';
+                    } else if (document.getElementById('stmt-panel-balance').style.display !== 'none') {
+                        activeTableId = 'table-balance';
+                    } else if (document.getElementById('stmt-panel-cashflow').style.display !== 'none') {
+                        activeTableId = 'table-cashflow';
+                    }
+
+                    if (!activeTableId) return;
+
+                    const table = document.getElementById(activeTableId);
+                    if (!table) return;
+
+                    const rows = table.querySelectorAll('.financial-row');
+                    rows.forEach(row => {
+                        // Skip category header spacer rows
+                        if (row.classList.contains('category-header-row')) {
+                            return;
+                        }
+                        
+                        const labelCell = row.querySelector('.row-label');
+                        if (labelCell) {
+                            const labelText = labelCell.textContent.toLowerCase();
+                            
+                            // Check if row is visible under current section tab filter
+                            let matchesSection = true;
+                            if (activeTableId === 'table-balance') {
+                                const parentBody = row.parentElement;
+                                if (parentBody && parentBody.style.display === 'none') {
+                                    matchesSection = false;
+                                }
+                            } else if (activeTableId === 'table-cashflow') {
+                                const parentBody = row.parentElement;
+                                if (parentBody && parentBody.style.display === 'none') {
+                                    matchesSection = false;
+                                }
+                            }
+
+                            if (matchesSection && (query === '' || labelText.indexOf(query) > -1)) {
+                                row.style.display = '';
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        }
+                    });
+                }
+            </script>
+
+
+        <!-- ========================================== -->
+        <!-- VIEW: DISCOUNTED CASH FLOW VALUATION       -->
+        <!-- ========================================== -->
+        {% elif view == 'dcf' %}
+            
+            {% if dcf_error %}
+                <div class="error-box">
+                    <div class="error-title">DCF SYSTEM WARNING</div>
+                    <div>{{ dcf_error }}</div>
+                </div>
+            {% else %}
+                <div class="dcf-grid">
+                    
+                    <!-- Left: Parameters Inputs Form -->
+                    <div class="dcf-form-panel">
+                        <div class="section-title" style="margin-top: 0; font-size: 12px; color: #3b5998;">MODEL INPUTS</div>
+                        <form action="{{ url_for('ticker_detail', symbol=symbol) }}" method="GET">
+                            <!-- Retain DCF view when recalculating -->
+                            <input type="hidden" name="view" value="dcf">
+                            
+                            <div class="dcf-form-group">
+                                <label>Base FCF (Last Yr)</label>
+                                <input type="text" value="{{ dcf_results.fcf_base_formatted }}" disabled style="background-color: #e9ebee; text-align: right;">
+                            </div>
+                            
+                            <div class="dcf-form-group">
+                                <label>Growth Rate % (Y1-Y5)</label>
+                                <input type="number" name="growth" step="0.1" value="{{ dcf_params.growth }}" class="dcf-form-cell" required>
+                            </div>
+                            
+                            <div class="dcf-form-group">
+                                <label>Discount Rate % (WACC)</label>
+                                <input type="number" name="discount" step="0.1" value="{{ dcf_params.discount }}" class="dcf-form-cell" required>
+                            </div>
+                            
+                            <div class="dcf-form-group">
+                                <label>Terminal Growth % (Perp)</label>
+                                <input type="number" name="terminal" step="0.1" value="{{ dcf_params.terminal }}" class="dcf-form-cell" required>
+                            </div>
+                            
+                            <div class="dcf-form-group">
+                                <label>Shares Outstanding</label>
+                                <input type="text" value="{{ dcf_results.shares }}" disabled style="background-color: #e9ebee; text-align: right;">
+                            </div>
+                            
+                            <div class="dcf-form-group">
+                                <label>Net Debt (Debt - Cash)</label>
+                                <input type="text" value="{{ dcf_results.net_debt }}" disabled style="background-color: #e9ebee; text-align: right;">
+                            </div>
+                            
+                            <button type="submit" class="btn dcf-btn">RECALCULATE VALUE</button>
+                        </form>
+                        
+                        <!-- Valuation Fair Price Badge -->
+                        <div class="dcf-fair-value-box">
+                            <div class="dcf-fair-value-title">Intrinsic Fair Value</div>
+                            <div class="dcf-fair-value-price">{{ dcf_results.fair_value }}</div>
+                            <div style="font-size: 9px; color: #555; margin-top: 3px;">per share</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right: Projections & Steps Tables -->
+                    <div>
+                        <!-- Projection Output Table -->
+                        <div class="box">
+                            <div class="box-header">5-YEAR FREE CASH FLOW PROJECTIONS</div>
+                            <table class="data-table">
+                                <thead>
+                                    <tr class="statement-header-row">
+                                        <th>Year</th>
+                                        <th class="text-right">Projected FCF</th>
+                                        <th class="text-right">Discount Factor (WACC)</th>
+                                        <th class="text-right">Present Value (PV)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Base (0)</td>
+                                        <td class="text-right text-bold">{{ dcf_results.fcf_base_formatted }}</td>
+                                        <td class="text-right">-</td>
+                                        <td class="text-right">-</td>
+                                    </tr>
+                                    {% for p in dcf_results.projections %}
+                                        <tr>
+                                            <td>Year {{ p.year }}</td>
+                                            <td class="text-right">{{ p.fcf }}</td>
+                                            <td class="text-right">at {{ dcf_results.growth_rate_used }} growth</td>
+                                            <td class="text-right text-bold">{{ p.pv }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Valuation Math Details -->
+                        <div class="box">
+                            <div class="box-header">VALUATION ARITHMETIC</div>
+                            <table class="data-table">
+                                <thead>
+                                    <tr class="statement-header-row">
+                                        <th>Valuation Step</th>
+                                        <th class="text-right">Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in [
+                                        ('PV of Projected FCFs (Sum Y1-Y5)', dcf_results.sum_pv_fcf, true, false, ''),
+                                        ('Terminal Value (Perpetuity at ' ~ dcf_results.terminal_growth_used ~ ')', dcf_results.terminal_value, false, false, ''),
+                                        ('PV of Terminal Value', dcf_results.pv_terminal_value, true, false, ''),
+                                        ('Enterprise Value (EV)', dcf_results.enterprise_value, true, true, ''),
+                                        ('Less: Total Debt', '-' ~ dcf_results.debt, false, false, 'text-red'),
+                                        ('Add: Total Cash & Equivalents', '+' ~ dcf_results.cash, false, false, 'text-green'),
+                                        ('Equity Value', dcf_results.equity_value, true, true, ''),
+                                        ('Divided by: Shares Outstanding', dcf_results.shares, false, false, ''),
+                                        ('Intrinsic Value (Fair Value per Share)', dcf_results.fair_value, true, true, 'text-green')
+                                    ] %}
+                                    <tr class="{% if row[2] %}row-summary{% endif %} {% if row[3] %}row-major-total{% endif %}">
+                                        <td class="{% if row[4] %}{{ row[4] }}{% endif %} {% if row[2] %}text-bold{% endif %}">{{ row[0] }}</td>
+                                        <td class="text-right text-bold {% if row[4] %}{{ row[4] }}{% endif %}">{{ row[1] }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+        {% endif %}
+ 
+    </div>
+
+    <!-- Right Sidebar Column: Ratios Table (Dynamic loop captures edits in app.py) -->
+    <div class="layout-col-side">
+        <div class="box">
+            <div class="box-header">FINANCIAL RATIOS & STATS</div>
+            <div class="box-body-dense">
+                <table class="data-table">
+                    <thead>
+                        <tr class="statement-header-row">
+                            <th>Financial Metric</th>
+                            <th class="text-right">Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for metric_name, metric_val in ratios.items() %}
+                            <tr>
+                                <td class="text-bold" style="color: #555; font-size: 10px;">{{ metric_name }}</td>
+                                <td class="text-right text-bold" style="color: #111;">{{ metric_val }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Safe check for chart_data (defined only in overview subview, empty otherwise)
+        const chartData = {{ (chart_data or []) | tojson | safe }};
+        const canvas = document.getElementById('ticker-chart');
+        if (canvas && chartData && chartData.length) {
+            new StockChart(canvas, chartData);
+        }
+    });
+</script>
+{% endblock %}

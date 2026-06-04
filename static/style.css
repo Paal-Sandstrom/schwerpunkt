@@ -1,0 +1,749 @@
+/* 
+   Schwerpunkt - Retro Web-Based Stock Terminal
+   Custom CSS Web Layout Overhaul
+*/
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #eceff5; /* Classic early 2000s Web/Facebook Blue-Gray Background */
+    font-family: Tahoma, Arial, sans-serif;
+    color: #333333;
+    font-size: 11px;
+    padding: 20px 0;
+}
+
+a {
+    color: #3b5998;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+a:hover {
+    color: #ff0000;
+}
+
+/* ---------------------------------------------------------
+   PREMIUM WEB CONTAINER
+   --------------------------------------------------------- */
+.container {
+    width: 1000px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border: 1px solid #d3d9e8;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+}
+
+/* ---------------------------------------------------------
+   UNIFIED WEB HEADER BAR (Early Facebook style)
+   --------------------------------------------------------- */
+.web-header {
+    background-color: #3b5998; /* Facebook Blue */
+    color: #ffffff;
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #29487d;
+}
+
+.web-logo-block {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.web-logo-text {
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: -0.5px;
+}
+
+.web-logo-icon {
+    font-size: 16px;
+}
+
+.web-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.web-nav-link {
+    color: #d8dfea;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 2px;
+}
+
+.web-nav-link:hover {
+    color: #ffffff;
+    background-color: #5c75a6;
+    text-decoration: none;
+}
+
+.web-nav-link.active {
+    color: #ffffff;
+    background-color: #29487d;
+}
+
+.web-search-box {
+    display: flex;
+    align-items: center;
+}
+
+.web-search-input {
+    border: 1px solid #29487d;
+    padding: 3px 8px;
+    font-size: 11px;
+    width: 280px;
+    height: 24px;
+    border-radius: 2px;
+    font-family: Tahoma, Arial, sans-serif;
+}
+
+.web-search-input:focus {
+    outline: 2px solid #3b5998;
+}
+
+.web-search-btn {
+    background-color: #f6f7f9;
+    border: 1px solid #29487d;
+    border-left: none;
+    color: #333333;
+    padding: 0 12px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 0 2px 2px 0;
+    height: 24px;
+    outline: none;
+}
+
+.web-search-btn:hover {
+    background-color: #e9eaed;
+}
+
+.web-search-btn:active {
+    background-color: #d8dfea;
+    padding-top: 1px;
+}
+
+/* ---------------------------------------------------------
+   MAIN CONTENT AREA
+   --------------------------------------------------------- */
+.app-content {
+    background-color: #ffffff;
+    padding: 16px;
+    min-height: 500px;
+}
+
+/* ---------------------------------------------------------
+   WEB BOX / WIDGET CONTAINER
+   --------------------------------------------------------- */
+.box {
+    background-color: #ffffff;
+    border: 1px solid #d3d9e8;
+    margin-bottom: 15px;
+}
+
+.box-header {
+    background-color: #eceff5; /* Classic Light Gray-Blue */
+    color: #3b5998; /* Facebook Blue */
+    font-weight: bold;
+    font-size: 11px;
+    padding: 6px 10px;
+    border-bottom: 1px solid #d3d9e8;
+    letter-spacing: 0.2px;
+}
+
+.box-body {
+    padding: 12px;
+    background-color: #ffffff;
+}
+
+.section-title {
+    font-size: 12px;
+    font-weight: bold;
+    color: #3b5998;
+    margin-top: 15px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #d3d9e8;
+    padding-bottom: 3px;
+}
+
+.text-block {
+    font-size: 11px;
+    color: #555555;
+    line-height: 1.6;
+    margin-bottom: 12px;
+    padding: 10px;
+    background-color: #f6f7f9;
+    border: 1px solid #d3d9e8;
+}
+
+/* Layout split structures */
+.layout-split {
+    display: flex;
+    gap: 15px;
+}
+
+.layout-col-main {
+    flex: 2;
+}
+
+.layout-col-side {
+    flex: 1;
+}
+
+.layout-three-cols {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+/* ---------------------------------------------------------
+   DATA TABLES (Dense grid, spreadsheet-inspired)
+   --------------------------------------------------------- */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    font-family: Tahoma, Arial, sans-serif;
+    border: 1px solid #d3d9e8;
+}
+
+.data-table th {
+    background-color: #f6f7f9;
+    border: 1px solid #d3d9e8;
+    color: #333333;
+    font-weight: bold;
+    padding: 6px 8px;
+    text-align: left;
+}
+
+.data-table td {
+    border: 1px solid #e9eaed;
+    padding: 6px 8px;
+    color: #000000;
+    vertical-align: middle;
+    background-color: #ffffff;
+}
+
+/* Zebra striping for spreadsheet vibe */
+.data-table tr:nth-child(even) td {
+    background-color: #f9fafc;
+}
+
+.data-table tr:hover td {
+    background-color: #eceff5; /* Cell focus/hover highlight */
+}
+
+/* Utilities */
+.text-green {
+    color: #008800 !important;
+    font-weight: bold;
+}
+
+.text-red {
+    color: #cc0000 !important;
+    font-weight: bold;
+}
+
+.text-bold {
+    font-weight: bold;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+/* ---------------------------------------------------------
+   TACTILE INTERACTIVE BUTTONS
+   --------------------------------------------------------- */
+.btn {
+    background-color: #3b5998;
+    color: #ffffff;
+    border: 1px solid #29487d;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 4px 12px;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 2px;
+    outline: none;
+    display: inline-block;
+    user-select: none;
+}
+
+.btn:hover {
+    background-color: #4c66a4;
+    text-decoration: none;
+}
+
+.btn:active {
+    background-color: #29487d;
+    padding: 5px 11px 3px 13px; /* visual push down effect */
+}
+
+.btn-secondary {
+    background-color: #f6f7f9;
+    color: #333333;
+    border: 1px solid #bdc3c7;
+}
+
+.btn-secondary:hover {
+    background-color: #e9eaed;
+}
+
+.btn-secondary:active {
+    background-color: #d8dfea;
+    padding: 5px 11px 3px 13px;
+}
+
+/* Watchlist Buttons */
+.index-btn {
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px 8px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.index-btn:active {
+    padding: 4px 7px 2px 9px !important;
+}
+
+/* Pagination Control Buttons */
+.pagination-btn {
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px 10px;
+}
+
+.pagination-btn:active {
+    padding: 4px 9px 2px 11px !important;
+}
+
+/* DCF Valuation Recalculate Button */
+.dcf-btn {
+    width: 100%;
+    padding: 6px;
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+.dcf-btn:active {
+    padding: 7px 5px 5px 7px !important;
+}
+
+/* Shortcut navigation button in header/nav */
+.win-toolbar-btn-shortcut {
+    border: 1px solid #29487d;
+    background-color: #eceff5;
+    font-weight: bold;
+    font-size: 10px;
+    padding: 2px 6px;
+    text-decoration: none;
+    display: inline-block;
+    color: #3b5998;
+    outline: none;
+    border-radius: 2px;
+}
+
+.win-toolbar-btn-shortcut:hover {
+    background-color: #ffffff;
+    text-decoration: none;
+}
+
+.win-toolbar-btn-shortcut:active {
+    background-color: #d8dfea;
+    padding: 3px 5px 1px 7px;
+}
+
+/* ---------------------------------------------------------
+   TABS COMPONENTS
+   --------------------------------------------------------- */
+
+/* Web sub-view selectors (e.g. Overview | Financials | DCF) */
+.subview-tabs {
+    display: flex;
+    background-color: #eceff5;
+    border: 1px solid #d3d9e8;
+    border-bottom: none;
+    padding: 6px 10px 0 10px;
+    gap: 4px;
+}
+
+.subview-tab-item {
+    background-color: #f6f7f9;
+    border: 1px solid #d3d9e8;
+    border-bottom: none;
+    border-radius: 3px 3px 0 0;
+    padding: 6px 16px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #3b5998;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    outline: none;
+}
+
+.subview-tab-item:hover {
+    background-color: #e9eaed;
+    text-decoration: none;
+}
+
+.subview-tab-item.active {
+    background-color: #ffffff;
+    color: #333333;
+    border-bottom: 1px solid #ffffff;
+    margin-bottom: -1px;
+    z-index: 10;
+}
+
+.subview-tab-item:active:not(.active) {
+    padding: 7px 16px 5px 16px;
+}
+
+/* Nested section switcher tab bars (e.g. Income | Balance | Cash Flow) */
+.tab-bar {
+    display: flex;
+    background-color: #f6f7f9;
+    border-bottom: 1px solid #d3d9e8;
+    padding: 6px 8px 0 8px;
+    gap: 4px;
+    user-select: none;
+}
+
+.tab-item {
+    background-color: #f6f7f9;
+    border: 1px solid #d3d9e8;
+    border-bottom: none;
+    border-radius: 2px 2px 0 0;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #3b5998;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    outline: none;
+}
+
+.tab-item:hover {
+    background-color: #e9eaed;
+    text-decoration: none;
+}
+
+.tab-item.active {
+    background-color: #ffffff;
+    color: #333333;
+    border-bottom: 1px solid #ffffff;
+    margin-bottom: -1px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.tab-item:active:not(.active) {
+    padding: 5px 10px 3px 10px;
+}
+
+/* ---------------------------------------------------------
+   SUB-SECTIONS FILTER BAR
+   --------------------------------------------------------- */
+.section-filter-bar {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #f6f7f9;
+    border: 1px solid #d3d9e8;
+    padding: 5px 8px;
+    user-select: none;
+}
+
+.section-filter-label {
+    font-weight: bold;
+    color: #555555;
+    font-size: 11px;
+    margin-right: 4px;
+}
+
+.section-filter-item {
+    background-color: #ffffff;
+    border: 1px solid #bdc3c7;
+    color: #3b5998;
+    padding: 2px 8px;
+    cursor: pointer;
+    font-size: 10px;
+    border-radius: 2px;
+}
+
+.section-filter-item:hover {
+    background-color: #e9eaed;
+}
+
+.section-filter-item.active {
+    background-color: #3b5998;
+    color: #ffffff;
+    border-color: #29487d;
+    font-weight: bold;
+}
+
+.section-filter-item:active:not(.active) {
+    background-color: #e9eaed;
+    padding: 3px 7px 1px 9px;
+}
+
+/* ---------------------------------------------------------
+   METRIC SUMMARY CARDS
+   --------------------------------------------------------- */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.metric-card {
+    background-color: #ffffff;
+    border: 1px solid #d3d9e8;
+    padding: 10px;
+    text-align: left;
+}
+
+.metric-label {
+    font-size: 9px;
+    color: #777777;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    border-bottom: 1px dashed #e9eaed;
+    padding-bottom: 2px;
+}
+
+.metric-value {
+    font-size: 15px;
+    font-weight: bold;
+    color: #3b5998;
+    font-family: "Courier New", Courier, monospace;
+}
+
+/* ---------------------------------------------------------
+   FINANCIALS & DCF FORMATTING DETAILS
+   --------------------------------------------------------- */
+.financials-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    margin-bottom: 15px;
+    border: 1px solid #d3d9e8;
+    background-color: #ffffff;
+}
+
+.line-filter-container {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #f6f7f9;
+    border: 1px solid #d3d9e8;
+    padding: 6px 10px;
+}
+
+.line-filter-label {
+    font-weight: bold;
+    color: #555555;
+    font-size: 11px;
+}
+
+.line-filter-input {
+    border: 1px solid #bdc3c7;
+    padding: 3px 6px;
+    font-size: 11px;
+    width: 250px;
+    font-family: Tahoma, Arial, sans-serif;
+    color: #333333;
+    border-radius: 2px;
+}
+
+.line-filter-input:focus {
+    outline: 2px solid #3b5998;
+}
+
+/* Statement rows custom underlines & colors */
+.statement-row-total {
+    font-weight: bold;
+}
+
+.statement-row-total td {
+    background-color: #f6f7f9 !important;
+    border-top: 1px solid #000000 !important;
+    border-bottom: 2px double #000000 !important; /* Double accounting underline */
+}
+
+.statement-row-sub-total {
+    font-weight: bold;
+}
+
+.statement-row-sub-total td {
+    background-color: #fafbfc !important;
+    border-bottom: 1px solid #000000 !important;
+}
+
+.statement-header-row th {
+    font-weight: bold !important;
+    background-color: #eceff5 !important;
+}
+
+/* Soft category web highlights */
+.highlight-assets {
+    background-color: #e6ffed !important;
+}
+
+.highlight-liabilities {
+    background-color: #ffeef0 !important;
+}
+
+.highlight-equity {
+    background-color: #f1f8ff !important;
+}
+
+/* DCF grid layout */
+.dcf-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.dcf-form-panel {
+    background-color: #ffffff;
+    border: 1px solid #d3d9e8;
+    padding: 12px;
+}
+
+.dcf-form-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.dcf-form-group label {
+    font-weight: bold;
+    color: #555555;
+}
+
+.dcf-form-group input {
+    border: 1px solid #bdc3c7;
+    padding: 4px 6px;
+    font-size: 11px;
+    width: 140px;
+    text-align: right;
+    border-radius: 2px;
+}
+
+.dcf-form-cell {
+    background-color: #ffffe0; /* highlight editable parameters */
+}
+
+.dcf-fair-value-box {
+    margin-top: 15px;
+    background-color: #eceff5;
+    border: 1px solid #3b5998;
+    padding: 12px;
+    text-align: center;
+}
+
+.dcf-fair-value-title {
+    font-weight: bold;
+    color: #3b5998;
+    font-size: 11px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.dcf-fair-value-price {
+    font-size: 24px;
+    font-weight: bold;
+    color: #008800;
+    font-family: "Courier New", Courier, monospace;
+}
+
+/* ---------------------------------------------------------
+   CHARTS & EMBEDDED WIDGETS
+   --------------------------------------------------------- */
+.chart-container {
+    border: 1px solid #d3d9e8;
+    padding: 12px;
+    background-color: #ffffff;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+/* Breadcrumbs / Back navigation link */
+.breadcrumb-container {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+/* ---------------------------------------------------------
+   WEB FOOTER
+   --------------------------------------------------------- */
+.web-footer {
+    background-color: #f6f7f9;
+    border-top: 1px solid #d3d9e8;
+    padding: 10px 16px;
+    font-size: 11px;
+    color: #666666;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+}
+
+.web-footer-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.web-footer-right {
+    display: flex;
+    gap: 16px;
+}
+
+/* Flash alerts */
+.error-box {
+    background-color: #ffcccc;
+    border: 1px solid #ff0000;
+    color: #000000;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.error-title {
+    font-weight: bold;
+    color: #ff0000;
+    margin-bottom: 4px;
+}
+
+.box-body-dense {
+    padding: 0;
+    background-color: #ffffff;
+}

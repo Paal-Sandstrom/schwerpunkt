@@ -1,0 +1,515 @@
+{% extends 'base.html' %}
+
+{% block title %}Index Constituents - {{ index_name }} - Schwerpunkt{% endblock %}
+
+{% block content %}
+
+
+<div class="layout-split">
+    <!-- Main Content Column: Paginated Table List -->
+    <div class="layout-col-main" style="flex: 2;">
+        <div class="box">
+            <div class="box-header">INDEX {{ index_name|upper }} CONSTITUENTS</div>
+            <div class="box-body" style="padding: 10px;">
+                
+                <!-- Filter bar -->
+                <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <span style="font-weight: bold; color: #555; font-size: 11px;">FILTER STOCKS:</span>
+                    <input type="text" id="constituents-filter" placeholder="Type ticker or name..." class="line-filter-input" style="width: 250px;" autocomplete="off">
+                    <span id="constituents-count" style="font-size: 11px; color: #666; margin-left: auto;">Loading stocks...</span>
+                </div>
+
+                <!-- Table displaying constituents -->
+                <table class="data-table data-table-striped" id="constituents-table">
+                    <thead>
+                        <tr class="statement-header-row">
+                            <th style="width: 15%; text-align: left;">Ticker</th>
+                            <th style="width: 45%; text-align: left;">Company Name</th>
+                            <th style="width: 20%; text-align: right;">Market Capitalization</th>
+                            <th style="width: 20%; text-align: right;">P/E Ratio</th>
+                        </tr>
+                    </thead>
+                    <tbody id="constituents-tbody">
+                        <!-- Dynamic rows injected by Javascript -->
+                    </tbody>
+                </table>
+
+                <!-- Pagination Controls -->
+                <div id="pagination-controls" style="margin-top: 15px; display: flex; justify-content: center; align-items: center; gap: 10px; font-size: 11px;">
+                    <button id="btn-prev" class="btn btn-secondary pagination-btn">« Prev</button>
+                    <span id="page-indicator" style="font-weight: bold; color: #555;">Page 1 of 1</span>
+                    <button id="btn-next" class="btn btn-secondary pagination-btn">Next »</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Column: Sector Concentration & Top Holdings Charts -->
+    <div class="layout-col-side" style="flex: 1; max-width: 320px; min-width: 300px; display: flex; flex-direction: column; gap: 15px;">
+        
+        <!-- Sector Concentration Box -->
+        <div class="box" style="margin-bottom: 0;">
+            <div class="box-header">SECTOR WEIGHT (MARKET CAP)</div>
+            <div class="box-body" style="padding: 10px; text-align: center;">
+                <canvas id="sector-pie-chart" style="width: 100%; height: 160px; display: block; margin: 0 auto;"></canvas>
+                
+                <!-- Sector Legend Table -->
+                <div style="margin-top: 12px; text-align: left; font-size: 10px; border-top: 1px solid #d3d9e8; padding-top: 8px;">
+                    <table style="width: 100%; border-collapse: collapse; line-height: 1.5;">
+                        <tbody id="sector-legend-tbody">
+                            {% for sec in sector_concentration[:6] %}
+                            <tr>
+                                <td style="width: 15px; padding: 2px 0; vertical-align: middle;">
+                                    <div class="sector-color-box" style="width: 10px; height: 10px; border: 1px solid #999;"></div>
+                                </td>
+                                <td style="padding: 2px 0; font-weight: bold; color: #555; vertical-align: middle;">{{ sec.sector }}</td>
+                                <td style="text-align: right; padding: 2px 0; color: #333; vertical-align: middle;">{{ sec.percentage }}%</td>
+                            </tr>
+                            {% endfor %}
+                            
+                            {% if sector_concentration|length > 6 %}
+                            {% set other_pct = sector_concentration[6:]|sum(attribute='percentage') %}
+                            <tr>
+                                <td style="width: 15px; padding: 2px 0; vertical-align: middle;">
+                                    <div class="sector-color-box" style="width: 10px; height: 10px; border: 1px solid #999;"></div>
+                                </td>
+                                <td style="padding: 2px 0; font-weight: bold; color: #555; vertical-align: middle;">Other Sectors</td>
+                                <td style="text-align: right; padding: 2px 0; color: #333; vertical-align: middle;">{{ "%.2f"|format(other_pct) }}%</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Holdings Pie Chart Box -->
+        <div class="box" style="margin-bottom: 0;">
+            <div class="box-header">TOP CONSTITUENTS WEIGHT (95%)</div>
+            <div class="box-body" style="padding: 10px; text-align: center;">
+                <canvas id="holdings-pie-chart" style="width: 100%; height: 160px; display: block; margin: 0 auto;"></canvas>
+                
+                <!-- Holdings Legend Table -->
+                <div style="margin-top: 12px; text-align: left; font-size: 10px; border-top: 1px solid #d3d9e8; padding-top: 8px;">
+                    <table style="width: 100%; border-collapse: collapse; line-height: 1.5;">
+                        <tbody id="holdings-legend-tbody">
+                            {% for hold in top_holdings[:8] %}
+                            <tr>
+                                <td style="width: 15px; padding: 2px 0; vertical-align: middle;">
+                                    <div class="holdings-color-box" style="width: 10px; height: 10px; border: 1px solid #999;"></div>
+                                </td>
+                                <td style="padding: 2px 0; font-weight: bold; color: #555; vertical-align: middle;">
+                                    {% if hold.symbol == 'Others' %}Other Tickers{% else %}{{ hold.symbol }} - {{ hold.name[:18] }}{% if hold.name|length > 18 %}...{% endif %}{% endif %}
+                                </td>
+                                <td style="text-align: right; padding: 2px 0; color: #333; vertical-align: middle;">{{ hold.percentage }}%</td>
+                            </tr>
+                            {% endfor %}
+                            
+                            {% if top_holdings|length > 8 %}
+                            {% set other_pct = top_holdings[8:]|sum(attribute='percentage') %}
+                            <tr>
+                                <td style="width: 15px; padding: 2px 0; vertical-align: middle;">
+                                    <div class="holdings-color-box" style="width: 10px; height: 10px; border: 1px solid #999;"></div>
+                                </td>
+                                <td style="padding: 2px 0; font-weight: bold; color: #555; vertical-align: middle;">Other Holdings</td>
+                                <td style="text-align: right; padding: 2px 0; color: #333; vertical-align: middle;">{{ "%.2f"|format(other_pct) }}%</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Annual Growth Box -->
+        <div class="box" style="margin-bottom: 0;">
+            <div class="box-header">ANNUAL GROWTH (% RETURN)</div>
+            <div class="box-body" style="padding: 10px; text-align: center;">
+                <canvas id="growth-line-chart" style="width: 100%; height: 140px; display: block; margin: 0 auto;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Inline Javascript Logic -->
+<script>
+// Parse stocks and charts data passed from Jinja
+const allStocks = {{ constituents|tojson }};
+const sectorData = [
+    {% for sec in sector_concentration[:6] %}
+    { label: "{{ sec.sector }}", value: {{ sec.percentage }} },
+    {% endfor %}
+    {% if sector_concentration|length > 6 %}
+    {% set other_pct = sector_concentration[6:]|sum(attribute='percentage') %}
+    { label: "Other Sectors", value: {{ other_pct }} }
+    {% endif %}
+];
+
+const holdingsData = [
+    {% for hold in top_holdings[:8] %}
+    { label: "{{ hold.symbol }}", value: {{ hold.percentage }} },
+    {% endfor %}
+    {% if top_holdings|length > 8 %}
+    {% set other_pct = top_holdings[8:]|sum(attribute='percentage') %}
+    { label: "Other Holdings", value: {{ other_pct }} }
+    {% endif %}
+];
+
+const growthData = {{ growth_data|tojson }};
+
+// Custom color palette matching Schwerpunkt retro Web 2.0 aesthetics - vibrant distinct colors
+const themeColors = [
+    '#3b5998', // Classic FB Blue
+    '#2ecc71', // Green
+    '#e74c3c', // Red
+    '#ff9800', // Orange
+    '#9b59b6', // Purple
+    '#f1c40f', // Yellow
+    '#1abc9c', // Teal
+    '#e91e63', // Pink
+    '#8bc34a', // Lime Green
+    '#795548', // Brown
+    '#607d8b'  // Slate Gray
+];
+
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // ----------------------------------------------------
+    // 1. Pagination & Filtering Logic
+    // ----------------------------------------------------
+    const filterInput = document.getElementById('constituents-filter');
+    const tbody = document.getElementById('constituents-tbody');
+    const pageIndicator = document.getElementById('page-indicator');
+    const countIndicator = document.getElementById('constituents-count');
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    
+    const pageSize = 50;
+    let currentPage = 1;
+    let filteredStocks = [...allStocks];
+    
+    function updateList() {
+        const totalRows = filteredStocks.length;
+        const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
+        
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+        
+        // Slice data for current page
+        const start = (currentPage - 1) * pageSize;
+        const end = Math.min(start + pageSize, totalRows);
+        const pageData = filteredStocks.slice(start, end);
+        
+        // Render rows HTML
+        let html = '';
+        if (pageData.length > 0) {
+            pageData.forEach((stock, idx) => {
+                html += `
+                <tr class="constituent-row">
+                    <td>
+                        <a href="/ticker/${stock.symbol}" class="text-bold">${stock.symbol}</a>
+                    </td>
+                    <td>${stock.name}</td>
+                    <td class="text-right">${stock.market_cap_formatted}</td>
+                    <td class="text-right">${stock.pe_ratio_formatted}</td>
+                </tr>`;
+            });
+        } else {
+            html = `<tr><td colspan="4" class="text-center" style="color: #888; padding: 25px;">No constituents match your query.</td></tr>`;
+        }
+        tbody.innerHTML = html;
+        
+        // Update Indicator labels
+        pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
+        countIndicator.textContent = `Showing ${filteredStocks.length} of ${allStocks.length} stocks`;
+        
+        // Enable/Disable pagination buttons
+        btnPrev.disabled = (currentPage === 1);
+        btnNext.disabled = (currentPage === totalPages);
+        
+        // Styling disabled state
+        btnPrev.style.opacity = (currentPage === 1) ? '0.5' : '1.0';
+        btnPrev.style.cursor = (currentPage === 1) ? 'default' : 'pointer';
+        btnNext.style.opacity = (currentPage === totalPages) ? '0.5' : '1.0';
+        btnNext.style.cursor = (currentPage === totalPages) ? 'default' : 'pointer';
+    }
+    
+    // Keypress filter event
+    if (filterInput) {
+        filterInput.focus();
+        filterInput.addEventListener('input', function() {
+            const query = filterInput.value.toLowerCase().trim();
+            
+            filteredStocks = allStocks.filter(stock => {
+                const sym = (stock.symbol || '').toLowerCase();
+                const name = (stock.name || '').toLowerCase();
+                return sym.includes(query) || name.includes(query);
+            });
+            
+            currentPage = 1;
+            updateList();
+        });
+    }
+    
+    // Click page events
+    btnPrev.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            updateList();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+    
+    btnNext.addEventListener('click', () => {
+        const totalPages = Math.ceil(filteredStocks.length / pageSize);
+        if (currentPage < totalPages) {
+            currentPage++;
+            updateList();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+    
+    // First load render
+    updateList();
+
+    // ----------------------------------------------------
+    // 2. Render HTML Legend Color Boxes
+    // ----------------------------------------------------
+    const sectorBoxes = document.querySelectorAll('.sector-color-box');
+    sectorBoxes.forEach((box, i) => {
+        box.style.backgroundColor = themeColors[i % themeColors.length];
+    });
+
+    const holdingsBoxes = document.querySelectorAll('.holdings-color-box');
+    holdingsBoxes.forEach((box, i) => {
+        box.style.backgroundColor = themeColors[i % themeColors.length];
+    });
+
+    // ----------------------------------------------------
+    // 3. Render Canvas Charts
+    // ----------------------------------------------------
+    drawPieChart('sector-pie-chart', sectorData, themeColors);
+    drawPieChart('holdings-pie-chart', holdingsData, themeColors);
+    drawGrowthChart('growth-line-chart', growthData);
+});
+
+// Pie Chart canvas drawer helper
+function drawPieChart(canvasId, data, colors) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    
+    const width = rect.width;
+    const height = rect.height;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const radius = Math.min(centerX, centerY) - 8;
+    
+    const total = data.reduce((sum, item) => sum + item.value, 0);
+    if (total === 0) return;
+    
+    let startAngle = -0.5 * Math.PI; // Start at 12 o'clock
+    
+    data.forEach((item, idx) => {
+        const sliceAngle = (item.value / total) * 2 * Math.PI;
+        
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
+        ctx.closePath();
+        
+        ctx.fillStyle = colors[idx % colors.length];
+        ctx.fill();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#ffffff';
+        ctx.stroke();
+        
+        startAngle += sliceAngle;
+    });
+}
+
+// Line Chart canvas drawer helper
+function drawGrowthChart(canvasId, rawData) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    
+    const width = rect.width;
+    const height = rect.height;
+    
+    const paddingLeft = 32;
+    const paddingRight = 10;
+    const paddingTop = 12;
+    const paddingBottom = 16;
+    
+    const chartWidth = width - paddingLeft - paddingRight;
+    const chartHeight = height - paddingTop - paddingBottom;
+    
+    if (rawData.length === 0) return;
+    
+    const values = rawData.map(d => d.growth);
+    
+    let minVal = Math.min(...values, 0);
+    let maxVal = Math.max(...values, 0);
+    const range = maxVal - minVal;
+    minVal -= (range * 0.15) || 5;
+    maxVal += (range * 0.15) || 5;
+    
+    function getX(index) {
+        return paddingLeft + (index / (rawData.length - 1)) * chartWidth;
+    }
+    
+    function getY(val) {
+        return paddingTop + chartHeight - ((val - minVal) / (maxVal - minVal)) * chartHeight;
+    }
+    
+    const gridSteps = 4;
+    let hoverIndex = -1;
+    
+    function handleMouseMove(e) {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        
+        let nearestIdx = -1;
+        let minDist = Infinity;
+        
+        rawData.forEach((d, idx) => {
+            const x = getX(idx);
+            const dist = Math.abs(mouseX - x);
+            if (dist < minDist) {
+                minDist = dist;
+                nearestIdx = idx;
+            }
+        });
+        
+        if (nearestIdx !== -1 && minDist < 15) {
+            if (hoverIndex !== nearestIdx) {
+                hoverIndex = nearestIdx;
+                draw();
+            }
+        } else {
+            if (hoverIndex !== -1) {
+                hoverIndex = -1;
+                draw();
+            }
+        }
+    }
+    
+    function draw() {
+        ctx.clearRect(0, 0, width, height);
+        
+        // Y grid lines and labels
+        ctx.fillStyle = '#666666';
+        ctx.font = '8px Tahoma';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        
+        for (let i = 0; i <= gridSteps; i++) {
+            const val = minVal + (i / gridSteps) * (maxVal - minVal);
+            const y = getY(val);
+            ctx.fillText(val.toFixed(0) + '%', paddingLeft - 4, y);
+            
+            ctx.beginPath();
+            ctx.moveTo(paddingLeft, y);
+            ctx.lineTo(width - paddingRight, y);
+            
+            // Highlight zero baseline or draw grid dotted lines
+            ctx.strokeStyle = Math.abs(val) < 0.2 ? '#ff0000' : '#e9ebee';
+            ctx.lineWidth = Math.abs(val) < 0.2 ? 1.0 : 0.5;
+            ctx.stroke();
+        }
+        
+        // X Labels
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        rawData.forEach((d, idx) => {
+            if (idx % 2 === 0 || idx === rawData.length - 1) {
+                ctx.fillText(d.year, getX(idx), paddingTop + chartHeight + 3);
+            }
+        });
+        
+        // Line path
+        ctx.beginPath();
+        rawData.forEach((d, idx) => {
+            const x = getX(idx);
+            const y = getY(d.growth);
+            if (idx === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        });
+        ctx.strokeStyle = '#3b5998';
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
+        
+        // Line points
+        rawData.forEach((d, idx) => {
+            const x = getX(idx);
+            const y = getY(d.growth);
+            
+            ctx.beginPath();
+            ctx.arc(x, y, 2.5, 0, 2 * Math.PI);
+            ctx.fillStyle = idx === hoverIndex ? '#ff0000' : '#ffffff';
+            ctx.fill();
+            ctx.strokeStyle = idx === hoverIndex ? '#ff0000' : '#3b5998';
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+        });
+        
+        // Guideline & Tooltip drawing
+        if (hoverIndex !== -1) {
+            const d = rawData[hoverIndex];
+            const x = getX(hoverIndex);
+            const y = getY(d.growth);
+            
+            // Draw guideline
+            ctx.beginPath();
+            ctx.moveTo(x, paddingTop);
+            ctx.lineTo(x, paddingTop + chartHeight);
+            ctx.strokeStyle = '#999999';
+            ctx.lineWidth = 0.8;
+            ctx.setLineDash([2, 2]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Draw tooltip box
+            const text = `${d.year}: ${d.growth > 0 ? '+' : ''}${d.growth.toFixed(1)}%`;
+            ctx.font = 'bold 8px Tahoma';
+            const textWidth = ctx.measureText(text).width;
+            const boxWidth = textWidth + 8;
+            const boxHeight = 14;
+            const boxX = Math.max(paddingLeft, Math.min(x - boxWidth / 2, width - paddingRight - boxWidth));
+            const boxY = Math.max(paddingTop, y - boxHeight - 5);
+            
+            ctx.fillStyle = '#1d2a4a';
+            ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+            ctx.strokeStyle = '#ffffff';
+            ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, boxX + boxWidth / 2, boxY + boxHeight / 2);
+        }
+    }
+    
+    canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('mouseleave', () => {
+        hoverIndex = -1;
+        draw();
+    });
+    
+    draw();
+}
+</script>
+{% endblock %}
