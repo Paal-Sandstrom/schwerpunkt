@@ -1532,13 +1532,15 @@ def terminal_command():
                 return jsonify({'error': f'No chart data for {ticker}'})
                 
         else:
-            ticker = parts[-1].upper()
             year = None
-            if len(parts) > 2 and parts[-2].isdigit() and len(parts[-2]) == 4:
-                year = parts[-2]
-                metric_query = " ".join(parts[:-2]).lower()
-            else:
-                metric_query = " ".join(parts[:-1]).lower()
+            for i, p in enumerate(parts):
+                if p.isdigit() and len(p) == 4:
+                    year = p
+                    parts.pop(i)
+                    break
+            
+            ticker = parts[-1].upper()
+            metric_query = " ".join(parts[:-1]).lower()
                 
             # GCP FIX: Injected global desktop session context
             stock = yf.Ticker(ticker)
