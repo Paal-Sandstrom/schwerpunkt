@@ -37,17 +37,6 @@
                 {% endfor %}
             </tbody>
         </table>
-        
-        <!-- Tab switcher link to constituents watchlists at the bottom -->
-        <div style="background-color: #eceff5; padding: 6px 10px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #d3d9e8;">
-            <span style="font-weight: bold; color: #333; font-size: 10px;">CONSTITUENTs:</span>
-            <div style="display: flex; gap: 4px;">
-                <a href="{{ url_for('index_constituents', index_id='sp500') }}" class="btn btn-secondary index-btn">S&P 500</a>
-                <a href="{{ url_for('index_constituents', index_id='nasdaq100') }}" class="btn btn-secondary index-btn">Nasdaq 100</a>
-                <a href="{{ url_for('index_constituents', index_id='dow30') }}" class="btn btn-secondary index-btn">Dow Jones 30</a>
-                <a href="{{ url_for('index_constituents', index_id='russell3000') }}" class="btn btn-secondary index-btn">Russell 3000</a>
-            </div>
-        </div>
     </div>
 </div>
 

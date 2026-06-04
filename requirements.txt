@@ -1,5 +1,5 @@
-Flask
-yfinance
-matplotlib
-pandas
-requests
+Flask==3.0.3
+yfinance==0.2.40
+gunicorn==22.0.0
+matplotlib==3.8.4
+requests-cache==1.2.0

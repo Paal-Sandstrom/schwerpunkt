@@ -12,6 +12,15 @@
             <div class="box-header">INDEX {{ index_name|upper }} CONSTITUENTS</div>
             <div class="box-body" style="padding: 10px;">
                 
+                <!-- Index Switcher -->
+                <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid #d3d9e8;">
+                    <span style="font-weight: bold; color: #555; font-size: 11px;">SELECT INDEX:</span>
+                    <a href="{{ url_for('index_constituents', index_id='sp500') }}" class="btn {% if index_id == 'sp500' %}btn-secondary active{% else %}btn-secondary{% endif %} index-btn" {% if index_id == 'sp500' %}style="background-color: #3b5998; color: #fff;"{% endif %}>S&P 500</a>
+                    <a href="{{ url_for('index_constituents', index_id='nasdaq100') }}" class="btn {% if index_id == 'nasdaq100' %}btn-secondary active{% else %}btn-secondary{% endif %} index-btn" {% if index_id == 'nasdaq100' %}style="background-color: #3b5998; color: #fff;"{% endif %}>Nasdaq 100</a>
+                    <a href="{{ url_for('index_constituents', index_id='dow30') }}" class="btn {% if index_id == 'dow30' %}btn-secondary active{% else %}btn-secondary{% endif %} index-btn" {% if index_id == 'dow30' %}style="background-color: #3b5998; color: #fff;"{% endif %}>Dow Jones 30</a>
+                    <a href="{{ url_for('index_constituents', index_id='russell3000') }}" class="btn {% if index_id == 'russell3000' %}btn-secondary active{% else %}btn-secondary{% endif %} index-btn" {% if index_id == 'russell3000' %}style="background-color: #3b5998; color: #fff;"{% endif %}>Russell 3000</a>
+                </div>
+
                 <!-- Filter bar -->
                 <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                     <span style="font-weight: bold; color: #555; font-size: 11px;">FILTER STOCKS:</span>

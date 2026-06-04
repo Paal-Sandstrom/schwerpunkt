@@ -7,7 +7,7 @@ import concurrent.futures
 import re
 from datetime import datetime
 
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 import yfinance as yf
 import pandas as pd
 
@@ -1443,5 +1443,98 @@ def query_ticker():
         
     return redirect(url_for('ticker_detail', symbol=symbol))
 
+@app.route('/api/terminal', methods=['POST'])
+def terminal_command():
+    data = request.json
+    cmd = data.get('command', '').strip()
+    
+    if not cmd:
+        return jsonify({'error': 'Empty command'})
+        
+    parts = cmd.split()
+    action = parts[0].lower()
+    
+    try:
+        if action == 'help':
+            help_text = (
+                "AVAILABLE COMMANDS:\n"
+                "- chart [ticker] : Open interactive chart for ticker\n"
+                "- price [ticker] : Get current price info\n"
+                "- revenue [year] [ticker] : Get revenue for specific year\n"
+                "- pe [ticker] : Get P/E ratio\n"
+                "- nav [ticker] : Navigate main window to ticker page\n"
+                "- clear : Clear terminal output"
+            )
+            return jsonify({'action': 'print', 'text': help_text})
+            
+        elif action == 'nav' and len(parts) > 1:
+            ticker = parts[1].upper()
+            return jsonify({'action': 'redirect', 'url': url_for('ticker_detail', symbol=ticker)})
+            
+        elif action == 'price' and len(parts) > 1:
+            ticker = parts[1].upper()
+            stock = yf.Ticker(ticker)
+            info = stock.info
+            price = info.get('currentPrice') or info.get('regularMarketPrice')
+            if price:
+                return jsonify({'action': 'print', 'text': f"{ticker} Current Price: ${price:.2f}"})
+            else:
+                return jsonify({'error': f'Could not fetch price for {ticker}'})
+                
+        elif action == 'pe' and len(parts) > 1:
+            ticker = parts[1].upper()
+            stock = yf.Ticker(ticker)
+            info = stock.info
+            pe = info.get('trailingPE')
+            if pe:
+                return jsonify({'action': 'print', 'text': f"{ticker} P/E Ratio: {pe:.2f}"})
+            else:
+                return jsonify({'error': f'Could not fetch P/E for {ticker}'})
+                
+        elif action == 'revenue' and len(parts) > 2:
+            year = parts[1]
+            ticker = parts[2].upper()
+            stock = yf.Ticker(ticker)
+            financials = stock.financials
+            
+            if financials is not None and not financials.empty:
+                for col in financials.columns:
+                    if str(col).startswith(year):
+                        if 'Total Revenue' in financials.index:
+                            rev = financials.loc['Total Revenue', col]
+                            if rev is not None:
+                                formatted_rev = format_value(rev, 'currency')
+                                return jsonify({'action': 'print', 'text': f"{ticker} Revenue in {year}: {formatted_rev}"})
+                return jsonify({'error': f'Could not find revenue for {year}'})
+            else:
+                return jsonify({'error': f'No financial data for {ticker}'})
+                
+        elif action == 'chart' and len(parts) > 1:
+            ticker = parts[1].upper()
+            period = '1y'
+            if len(parts) > 2:
+                allowed_periods = ['1mo', '3mo', '6mo', '1y', '5y', 'max', 'ytd']
+                if parts[2].lower() in allowed_periods:
+                    period = parts[2].lower()
+            
+            stock = yf.Ticker(ticker)
+            hist = stock.history(period=period)
+            if not hist.empty:
+                chart_data = []
+                for date, row in hist.iterrows():
+                    chart_data.append({
+                        'date': date.strftime('%Y-%m-%d'),
+                        'close': float(row['Close']),
+                        'volume': int(row['Volume'])
+                    })
+                return jsonify({'action': 'chart', 'symbol': ticker, 'period': period, 'data': chart_data})
+            else:
+                return jsonify({'error': f'No chart data for {ticker}'})
+                
+        else:
+            return jsonify({'error': f"Unknown command or missing arguments: '{action}'. Type 'help'."})
+            
+    except Exception as e:
+        return jsonify({'error': str(e)})
 if __name__ == '__main__':
     app.run(debug=True, host='127.0.0.1', port=5000)
