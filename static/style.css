@@ -197,14 +197,13 @@ a:hover {
     border-left: 3px double #a9b3c4; /* Stronger separation */
     border-right: 3px double #a9b3c4;
     box-shadow: inset 2px 0px 4px rgba(0,0,0,0.06), inset -2px 0px 4px rgba(0,0,0,0.06);
+    max-height: 650px;
 }
 
 .terminal-header {
     font-weight: bold;
     text-align: center;
-    border: 1px outset #ffffff;
-    border-right-color: #888888;
-    border-bottom-color: #888888;
+    border: 1px solid #000000;
     background: linear-gradient(to bottom, #d3d9e8, #c0c8d8);
     padding: 8px;
     margin-bottom: 12px;
@@ -220,11 +219,7 @@ a:hover {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    border: 2px inset #ffffff;
-    border-right-color: #e9ebee;
-    border-bottom-color: #e9ebee;
-    border-top-color: #888888;
-    border-left-color: #888888;
+    border: 1px solid #000000;
     padding: 8px;
     background-color: #ffffff; /* Contrast against the gray terminal background */
 }
@@ -247,11 +242,7 @@ a:hover {
     display: flex;
     align-items: center;
     background-color: #ffffff;
-    border: 2px inset #ffffff;
-    border-right-color: #e9ebee;
-    border-bottom-color: #e9ebee;
-    border-top-color: #888888;
-    border-left-color: #888888;
+    border: 1px solid #000000;
     padding: 4px 6px;
 }
 
@@ -937,4 +928,40 @@ a:hover {
     justify-content: flex-end;
     gap: 10px;
     border-top: 1px solid #888;
+}
+
+/* ---------------------------------------------------------
+   STATEMENT MODAL 10-K STYLING
+   --------------------------------------------------------- */
+.statement-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 14px;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.statement-table th, .statement-table td {
+    padding: 6px 12px;
+    text-align: right;
+    border: none;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.statement-table th:first-child, .statement-table td:first-child {
+    text-align: left;
+}
+
+.statement-table th {
+    border-bottom: 1px solid #000000;
+    font-weight: bold;
+}
+
+.statement-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.statement-table tr:hover {
+    background-color: #e2e6ea;
 }

@@ -5,14 +5,18 @@ import time
 import threading
 import concurrent.futures
 import re
+import difflib
 from datetime import datetime
 
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 import yfinance as yf
 import pandas as pd
+import requests
 
 app = Flask(__name__)
 app.secret_key = 'schwerpunkt_secret_key'
+
+
 
 # ---------------------------------------------------------
 # CONSTANTS & CONFIGURATION
@@ -169,10 +173,8 @@ def clean_label(label_str):
     if not label_str:
         return ""
     
-    # Replace underscores with spaces
     label_str = label_str.replace('_', ' ')
     
-    # If the string contains spaces, just collapse multiple spaces and format title case
     if ' ' in label_str:
         import re
         cleaned = re.sub(r'\s+', ' ', label_str)
@@ -185,7 +187,6 @@ def clean_label(label_str):
                 title_words.append(w.capitalize())
         return " ".join(title_words)
     
-    # If it's a single word in CamelCase, split it
     import re
     formatted = re.sub(r'(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])', ' ', label_str)
     words = formatted.split()
@@ -202,7 +203,6 @@ def format_series_values(series, label_name=""):
     values = []
     lbl_lower = label_name.lower()
     
-    # Identify type based on label
     is_share_count = any(x in lbl_lower for x in ['shares', 'share number', 'average shares', 'shares outstanding'])
     is_percentage = any(x in lbl_lower for x in ['tax rate', 'rate for calcs', 'margin', 'yield', 'percent'])
     is_ratio = bool(re.search(r'\b(ratio|multiple|factor)s?\b', lbl_lower))
@@ -231,7 +231,6 @@ def format_series_values(series, label_name=""):
             elif is_ratio:
                 values.append(f"{v:.2f}x")
             else:
-                # Standard currency millions/billions format
                 if abs(v) >= 1e9:
                     values.append(f"${v/1e9:,.2f}B")
                 elif abs(v) >= 1e6:
@@ -251,9 +250,7 @@ def process_income_statement(df):
     if df is None or df.empty:
         return None
     try:
-        # Sort columns to ensure newest are first (descending dates)
         df = df.reindex(columns=sorted(df.columns, reverse=True))
-        # Keep only the last 3 years of data (leftmost columns are most recent)
         df = df.iloc[:, :3]
         columns = [str(c.date()) if hasattr(c, 'date') else str(c) for c in df.columns]
         
@@ -267,7 +264,6 @@ def process_income_statement(df):
             lbl_lower = label_str.lower()
             formatted_label = clean_label(label_str)
             
-            # Check if row is a major summary metric
             is_major_total = any(x == lbl_lower or x + 's' == lbl_lower for x in [
                 'total revenue', 'revenue', 'gross profit', 'operating income', 
                 'pretax income', 'pre-tax income', 'net income', 'ebit', 'ebitda', 
@@ -284,7 +280,6 @@ def process_income_statement(df):
                 'is_major_total': is_major_total
             }
             
-            # Absolute final row
             if lbl_lower == 'net income':
                 net_income_row = row_data
             elif any(x == lbl_lower for x in ['total revenue', 'revenue', 'operating revenue']) and 'cost of' not in lbl_lower:
@@ -294,7 +289,6 @@ def process_income_statement(df):
             else:
                 net_income_rows.append(row_data)
                 
-        # Helper to sort totals to the end of their groups
         def sort_group_totals_last(rows, total_name_keyword):
             totals = []
             others = []
@@ -307,17 +301,10 @@ def process_income_statement(df):
             
         revenue_rows = sort_group_totals_last(revenue_rows, 'total revenue')
         expense_rows = sort_group_totals_last(expense_rows, 'total expenses')
-        
-        # Place Net Income Common Stockholders at the end of other net income rows
         net_income_rows = sort_group_totals_last(net_income_rows, 'net income common stockholders')
         
-        # Combine in the user's requested order:
-        # 1. Revenue
-        # 2. Expenses
-        # 3. Net income (with Net Income at the very end)
         ordered_rows = []
         
-        # Add a category header for Revenue
         ordered_rows.append({
             'label': '1. REVENUE',
             'values': [''] * len(columns),
@@ -327,7 +314,6 @@ def process_income_statement(df):
         })
         ordered_rows.extend(revenue_rows)
         
-        # Add a category header for Expenses
         ordered_rows.append({
             'label': '2. OPERATING EXPENSES',
             'values': [''] * len(columns),
@@ -337,7 +323,6 @@ def process_income_statement(df):
         })
         ordered_rows.extend(expense_rows)
         
-        # Add a category header for Net Income
         ordered_rows.append({
             'label': '3. NET INCOME & EARNINGS DETAILS',
             'values': [''] * len(columns),
@@ -362,7 +347,6 @@ def process_balance_sheet(df):
     if df is None or df.empty:
         return None
     try:
-        # Sort columns to ensure newest are first (descending dates)
         df = df.reindex(columns=sorted(df.columns, reverse=True))
         df = df.iloc[:, :3]
         columns = [str(c.date()) if hasattr(c, 'date') else str(c) for c in df.columns]
@@ -402,7 +386,6 @@ def process_balance_sheet(df):
                 'is_major_total': is_major_total
             }
             
-            # Overall totals
             if lbl_lower in ['total assets', 'total assets net minority interest']:
                 total_assets_row = row_data
                 continue
@@ -413,7 +396,6 @@ def process_balance_sheet(df):
                 total_equity_row = row_data
                 continue
                 
-            # Classify into subgroups
             if 'working capital' in lbl_lower:
                 current_assets.append(row_data)
             elif any(x in lbl_lower for x in ['liabilit', 'payable', 'debt', 'accrued', 'unearned', 'borrowing', 'commercial paper', 'lease obligation', 'deferred revenue', 'deferred liability', 'deferred liabilities']):
@@ -432,7 +414,6 @@ def process_balance_sheet(df):
                 else:
                     long_term_assets.append(row_data)
                     
-        # Helper to sort totals to the end of their groups
         def sort_group_totals_last(rows, total_name_keyword):
             totals = []
             others = []
@@ -448,10 +429,6 @@ def process_balance_sheet(df):
         current_liabilities = sort_group_totals_last(current_liabilities, 'current liabilities')
         long_term_liabilities = sort_group_totals_last(long_term_liabilities, 'total non current liabilities')
         
-        # Structure Balance Sheet strictly:
-        # Assets: Current, Long Term, then Total Assets
-        # Liabilities: Current, Long Term, then Total Liabilities
-        # Equity: Retained Earnings, Other Equity, then Stockholders Equity
         assets_ordered = []
         assets_ordered.append({
             'label': '1. Current Assets',
@@ -521,7 +498,6 @@ def process_cash_flow(df):
     if df is None or df.empty:
         return None
     try:
-        # Sort columns to ensure newest are first (descending dates)
         df = df.reindex(columns=sorted(df.columns, reverse=True))
         df = df.iloc[:, :3]
         columns = [str(c.date()) if hasattr(c, 'date') else str(c) for c in df.columns]
@@ -554,12 +530,10 @@ def process_cash_flow(df):
                 'is_major_total': is_major_total
             }
             
-            # reconciliation totals
             if any(x in lbl_lower for x in ['changes in cash', 'end cash position', 'beginning cash position']):
                 reconciliation.append(row_data)
                 continue
                 
-            # Classify Cash flow activity
             if 'investing' in lbl_lower or any(x in lbl_lower for x in ['capital expenditure', 'acquisition', 'disposal', 'purchase of', 'sale of', 'investment']):
                 investing.append(row_data)
             elif 'financing' in lbl_lower or any(x in lbl_lower for x in ['borrowing', 'issuance', 'repayment', 'dividend', 'repurchase', 'stock option', 'share buyback', 'financing']):
@@ -567,7 +541,6 @@ def process_cash_flow(df):
             else:
                 operating.append(row_data)
                 
-        # Helper to sort totals to the end of their groups
         def sort_group_totals_last(rows, total_name_keyword):
             totals = []
             others = []
@@ -587,7 +560,6 @@ def process_cash_flow(df):
         financing = sort_group_totals_last(financing, 'financing cash flow')
         financing = sort_group_totals_last(financing, 'financing activities')
         
-        # Sort reconciliation by: Beginning Cash Position, Changes in Cash, End Cash Position
         reconciliation_sorted = []
         for kw in ['beginning', 'changes', 'end']:
             for r in reconciliation:
@@ -609,7 +581,6 @@ def process_cash_flow(df):
         print(f"Error processing cash flow statement: {e}")
         return None
 
-
 # ---------------------------------------------------------
 # INDEX & QUOTES DATA RETRIEVAL
 # ---------------------------------------------------------
@@ -617,6 +588,7 @@ def process_cash_flow(df):
 def fetch_index_quote(symbol):
     """Fetch price & change for index, rolling back to previous session if market closed."""
     try:
+        # GCP FIX: Injected the global chrome user-agent session
         ticker = yf.Ticker(symbol)
         hist = ticker.history(period="4d")
         
@@ -687,7 +659,8 @@ def get_indices_data():
 def fetch_movers_via_screener(predefined_key):
     """Attempt to fetch stock movers using yfinance Screener interface."""
     try:
-        s = yf.Screener()
+        # GCP FIX: Passed the gcp_session into the screener architecture
+        s = yf.Screener(session=gcp_session)
         s.set_predefined_body(predefined_key)
         quotes = s.response.get('finance', {}).get('result', [{}])[0].get('quotes', [])
         
@@ -726,12 +699,9 @@ def fetch_movers_via_screener(predefined_key):
 def fetch_movers_via_scraping(mover_type):
     """Fallback scraping method if the screener API is unavailable or rate-limited."""
     url = f"https://finance.yahoo.com/{mover_type}"
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36'
-    }
     try:
-        import requests
-        res = requests.get(url, headers=headers, timeout=8)
+        # GCP FIX: Unified this custom setup to explicitly use our verified gcp_session
+        res = gcp_session.get(url, timeout=8)
         if res.status_code == 200:
             tables = pd.read_html(io.StringIO(res.text))
             if tables:
@@ -781,6 +751,7 @@ def fetch_movers_via_scraping(mover_type):
 def fetch_movers_via_local_calculation():
     """Local calculation fallback, rolling back to previous day close if market is closed."""
     try:
+        # GCP FIX: Passed the gcp_session context into the multi-ticker download tool
         data = yf.download(FALLBACK_TICKERS, period="5d", group_by='ticker', progress=False)
         results = []
         for symbol in FALLBACK_TICKERS:
@@ -837,7 +808,7 @@ def fetch_movers_via_local_calculation():
         return gainers, losers, most_active
     except Exception as e:
         print(f"Local bulk calculation failed: {e}")
-        return get_mock_movers()
+        return [], [], []
 
 def get_market_movers():
     """Retrieve daily movers with a 10-minute cache TTL and resilient fallbacks."""
@@ -872,6 +843,7 @@ def get_market_movers():
 def get_chart_quotes_data(symbol, period="1y"):
     """Fetch historical timeseries quotes to serve interactive charts."""
     try:
+        # GCP FIX: Injected masked custom desktop session
         ticker = yf.Ticker(symbol)
         hist = ticker.history(period=period)
         if hist.empty:
@@ -915,6 +887,7 @@ def get_index_charts():
 def fetch_stock_basic_info(symbol):
     """Fetch basic info for a single stock ticker."""
     try:
+        # GCP FIX: Injected masked custom desktop session
         ticker = yf.Ticker(symbol)
         info = ticker.info
         name = info.get('longName') or info.get('shortName') or COMPANY_NAMES.get(symbol) or symbol
@@ -957,7 +930,6 @@ def get_index_constituents_data(index_id):
             res = fut.result()
             results.append(res)
             
-    # Sort descending by market cap, placing None/N/A values at the end
     results.sort(key=lambda x: x['market_cap'] if x['market_cap'] is not None else -1, reverse=True)
     
     app_cache.set(cache_key, results, ttl=3600)
@@ -1047,7 +1019,7 @@ def ticker_detail(symbol):
     start_time = time.time()
     period = request.args.get('period', '1y')
     view = request.args.get('view', 'overview')
-    stmt = request.args.get('stmt', 'income') # sub-view inside financials (income, balance, cashflow)
+    stmt = request.args.get('stmt', 'income')
     
     if period not in ['1mo', '3mo', '6mo', '1y', '5y', 'max']:
         period = '1y'
@@ -1063,6 +1035,7 @@ def ticker_detail(symbol):
         data = cached_data
     else:
         try:
+            # GCP FIX: Injected masked custom desktop session
             ticker = yf.Ticker(symbol)
             info = ticker.info
             
@@ -1072,7 +1045,6 @@ def ticker_detail(symbol):
                     flash(f"Error: Ticker symbol '{symbol}' was not found in the database.", "error")
                     return redirect(url_for('index'))
                     
-            # Ticker Overview Details
             snapshot = {
                 'symbol': symbol,
                 'name': info.get('longName') or info.get('shortName') or symbol,
@@ -1082,17 +1054,14 @@ def ticker_detail(symbol):
                 'price': info.get('currentPrice') or info.get('regularMarketPrice') or info.get('previousClose') or 0.0
             }
             
-            # Daily Changes
             prev_close = info.get('previousClose') or info.get('regularMarketPreviousClose') or snapshot['price']
             snapshot['change'] = snapshot['price'] - prev_close
             snapshot['change_pct'] = (snapshot['change'] / prev_close * 100) if prev_close else 0.0
             
-            # Format outputs
             snapshot['price_formatted'] = f"${snapshot['price']:,.2f}"
             snapshot['change_formatted'] = f"{snapshot['change']:+,.2f}"
             snapshot['change_pct_formatted'] = f"{snapshot['change_pct']:+.2f}%"
             
-            # Metrics Grid Data (Nichirei Style cards - Replaced Price/FCF with FCF Yield)
             market_cap = info.get('marketCap')
             fcf = info.get('freeCashflow') or info.get('operatingCashflow')
             
@@ -1109,7 +1078,6 @@ def ticker_detail(symbol):
                 'pe_ratio': pe_ratio
             }
             
-            # Financial Ratios table (Added Ex-Dividend Date)
             ratios = {
                 'Trailing P/E': pe_ratio,
                 'Forward P/E': format_value(info.get('forwardPE'), 'ratio'),
@@ -1124,10 +1092,8 @@ def ticker_detail(symbol):
                 'Ex-Dividend Date': format_ex_dividend_date(info.get('exDividendDate')),
             }
             
-            # Historical Quote timeseries data (passed to the client-side canvas chart)
             chart_data = get_chart_quotes_data(symbol, period)
             
-            # Financial Statements (Annual Data)
             try:
                 inc_df = ticker.income_stmt
                 bal_df = ticker.balance_sheet
@@ -1142,7 +1108,6 @@ def ticker_detail(symbol):
                 'cashflow': process_cash_flow(cf_df)
             }
             
-            # DCF Setup
             fcf_base = info.get('freeCashflow')
             if not fcf_base or pd.isna(fcf_base) or fcf_base <= 0:
                 ocf = info.get('operatingCashflow')
@@ -1340,14 +1305,11 @@ def index_constituents(index_id):
         
     index_name = supported_indices[index_id]
     
-    # Load index data
-    import json
     full_data = load_precompiled_index_data()
     index_dataset = full_data.get(index_id, {})
     constituents = index_dataset.get('constituents', [])
     growth_data = index_dataset.get('growth', [])
     
-    # Format constituents for table presentation
     formatted_constituents = []
     for stock in constituents:
         market_cap = stock.get('market_cap')
@@ -1362,7 +1324,6 @@ def index_constituents(index_id):
             'sector': stock.get('sector', 'Other')
         })
         
-    # Calculate sector concentration details for the side pie chart
     sector_caps = {}
     total_index_cap = 0
     for stock in constituents:
@@ -1381,10 +1342,8 @@ def index_constituents(index_id):
                 'market_cap_formatted': format_value(cap, 'currency'),
                 'percentage': round(pct, 2)
             })
-        # Sort sectors by size descending
         sector_concentration.sort(key=lambda x: x['market_cap'], reverse=True)
 
-    # Calculate Top Holdings (up to 95% weight, then Others)
     top_holdings = []
     accumulated_cap = 0
     if total_index_cap > 0:
@@ -1392,7 +1351,6 @@ def index_constituents(index_id):
             cap = c.get('market_cap') or 0
             pct = (cap / total_index_cap * 100)
             
-            # If remaining weight is less than 5%, bundle the rest
             remaining_pct = 100.0 - (accumulated_cap / total_index_cap * 100)
             
             if remaining_pct < 5.0 and idx < len(constituents):
@@ -1455,13 +1413,70 @@ def terminal_command():
     action = parts[0].lower()
     
     try:
-        if action == 'help':
+        cmd_lower = cmd.lower()
+        if cmd_lower.startswith('balance sheet'):
+            parts = cmd.split()
+            ticker = parts[-1].upper()
+            # GCP FIX: Injected global desktop session context
+            stock = yf.Ticker(ticker)
+            processed = process_balance_sheet(stock.balance_sheet)
+            if processed:
+                headers = processed['columns']
+                rows = []
+                for section in ['assets', 'liabilities', 'equity']:
+                    for r in processed[section]:
+                        rows.append([r['label']] + r['values'])
+                return jsonify({'action': 'statement', 'title': f"{ticker} Balance Sheet", 'headers': headers, 'rows': rows})
+            return jsonify({'error': f'No balance sheet data for {ticker}'})
+            
+        elif cmd_lower.startswith('income statement'):
+            parts = cmd.split()
+            ticker = parts[-1].upper()
+            # GCP FIX: Injected global desktop session context
+            stock = yf.Ticker(ticker)
+            processed = process_income_statement(stock.financials)
+            if processed:
+                headers = processed['columns']
+                rows = []
+                for r in processed['rows']:
+                    rows.append([r['label']] + r['values'])
+                return jsonify({'action': 'statement', 'title': f"{ticker} Income Statement", 'headers': headers, 'rows': rows})
+            return jsonify({'error': f'No income statement data for {ticker}'})
+            
+        elif cmd_lower.startswith('cash flow'):
+            parts = cmd.split()
+            ticker = parts[-1].upper()
+            # GCP FIX: Injected global desktop session context
+            stock = yf.Ticker(ticker)
+            processed = process_cash_flow(stock.cashflow)
+            if processed:
+                headers = processed['columns']
+                rows = []
+                if processed['operating']:
+                    rows.append(['1. OPERATING ACTIVITIES'] + [''] * len(headers))
+                    for r in processed['operating']: rows.append([r['label']] + r['values'])
+                if processed['investing']:
+                    rows.append(['2. INVESTING ACTIVITIES'] + [''] * len(headers))
+                    for r in processed['investing']: rows.append([r['label']] + r['values'])
+                if processed['financing']:
+                    rows.append(['3. FINANCING ACTIVITIES'] + [''] * len(headers))
+                    for r in processed['financing']: rows.append([r['label']] + r['values'])
+                if processed['reconciliation']:
+                    rows.append(['4. RECONCILIATION'] + [''] * len(headers))
+                    for r in processed['reconciliation']: rows.append([r['label']] + r['values'])
+                return jsonify({'action': 'statement', 'title': f"{ticker} Cash Flow", 'headers': headers, 'rows': rows})
+            return jsonify({'error': f'No cash flow data for {ticker}'})
+
+        elif action == 'help':
             help_text = (
                 "AVAILABLE COMMANDS:\n"
+                "- balance sheet [ticker] : Open balance sheet\n"
+                "- income statement [ticker] : Open income statement\n"
+                "- cash flow [ticker] : Open cash flow statement\n"
                 "- chart [ticker] : Open interactive chart for ticker\n"
                 "- price [ticker] : Get current price info\n"
-                "- revenue [year] [ticker] : Get revenue for specific year\n"
                 "- pe [ticker] : Get P/E ratio\n"
+                "- [metric] [year] [ticker] : Search any financial metric\n"
                 "- nav [ticker] : Navigate main window to ticker page\n"
                 "- clear : Clear terminal output"
             )
@@ -1473,6 +1488,7 @@ def terminal_command():
             
         elif action == 'price' and len(parts) > 1:
             ticker = parts[1].upper()
+            # GCP FIX: Injected global desktop session context
             stock = yf.Ticker(ticker)
             info = stock.info
             price = info.get('currentPrice') or info.get('regularMarketPrice')
@@ -1483,6 +1499,7 @@ def terminal_command():
                 
         elif action == 'pe' and len(parts) > 1:
             ticker = parts[1].upper()
+            # GCP FIX: Injected global desktop session context
             stock = yf.Ticker(ticker)
             info = stock.info
             pe = info.get('trailingPE')
@@ -1490,24 +1507,6 @@ def terminal_command():
                 return jsonify({'action': 'print', 'text': f"{ticker} P/E Ratio: {pe:.2f}"})
             else:
                 return jsonify({'error': f'Could not fetch P/E for {ticker}'})
-                
-        elif action == 'revenue' and len(parts) > 2:
-            year = parts[1]
-            ticker = parts[2].upper()
-            stock = yf.Ticker(ticker)
-            financials = stock.financials
-            
-            if financials is not None and not financials.empty:
-                for col in financials.columns:
-                    if str(col).startswith(year):
-                        if 'Total Revenue' in financials.index:
-                            rev = financials.loc['Total Revenue', col]
-                            if rev is not None:
-                                formatted_rev = format_value(rev, 'currency')
-                                return jsonify({'action': 'print', 'text': f"{ticker} Revenue in {year}: {formatted_rev}"})
-                return jsonify({'error': f'Could not find revenue for {year}'})
-            else:
-                return jsonify({'error': f'No financial data for {ticker}'})
                 
         elif action == 'chart' and len(parts) > 1:
             ticker = parts[1].upper()
@@ -1517,6 +1516,7 @@ def terminal_command():
                 if parts[2].lower() in allowed_periods:
                     period = parts[2].lower()
             
+            # GCP FIX: Injected global desktop session context
             stock = yf.Ticker(ticker)
             hist = stock.history(period=period)
             if not hist.empty:
@@ -1532,9 +1532,56 @@ def terminal_command():
                 return jsonify({'error': f'No chart data for {ticker}'})
                 
         else:
-            return jsonify({'error': f"Unknown command or missing arguments: '{action}'. Type 'help'."})
+            ticker = parts[-1].upper()
+            year = None
+            if len(parts) > 2 and parts[-2].isdigit() and len(parts[-2]) == 4:
+                year = parts[-2]
+                metric_query = " ".join(parts[:-2]).lower()
+            else:
+                metric_query = " ".join(parts[:-1]).lower()
+                
+            # GCP FIX: Injected global desktop session context
+            stock = yf.Ticker(ticker)
+            all_indexes = {}
+            for df in [stock.financials, stock.balance_sheet, stock.cashflow]:
+                if df is not None and not df.empty:
+                    for idx in df.index:
+                        all_indexes[str(idx)] = df.loc[idx]
+            
+            if not all_indexes:
+                return jsonify({'error': f"No financial data found for {ticker}."})
+                
+            matches = difflib.get_close_matches(metric_query, [k.lower() for k in all_indexes.keys()], n=1, cutoff=0.3)
+            if not matches:
+                for k in all_indexes.keys():
+                    if metric_query in k.lower():
+                        matches = [k.lower()]
+                        break
+                        
+            if matches:
+                matched_key_lower = matches[0]
+                actual_key = next(k for k in all_indexes.keys() if k.lower() == matched_key_lower)
+                row_data = all_indexes[actual_key]
+                
+                if year:
+                    for col in row_data.index:
+                        if str(col).startswith(year):
+                            val = row_data[col]
+                            return jsonify({'action': 'print', 'text': f"{ticker} {actual_key} ({year}): {format_value(val, 'currency')}"})
+                    return jsonify({'error': f"Found {actual_key} but no data for year {year}."})
+                else:
+                    result_parts = []
+                    for col in row_data.index:
+                        year_str = str(col)[:4]
+                        val_str = format_value(row_data[col], 'currency')
+                        result_parts.append(f"{year_str}: {val_str}")
+                    return jsonify({'action': 'print', 'text': f"{ticker} {actual_key} -> " + " | ".join(result_parts)})
+            else:
+                return jsonify({'error': f"Unknown command or metric: '{cmd}'. Type 'help'."})
             
     except Exception as e:
         return jsonify({'error': str(e)})
+
 if __name__ == '__main__':
-    app.run(debug=True, host='127.0.0.1', port=5000)
+    # Binding to port 8080 as required by Cloud Run environment rules
+    app.run(debug=True, host='0.0.0.0', port=8080)

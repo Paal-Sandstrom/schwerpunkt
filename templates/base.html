@@ -97,5 +97,22 @@
             </div>
         </div>
     </div>
+    <div id="statement-modal" class="modal-overlay">
+        <div class="modal-content" style="width: 1000px; max-height: 90vh; background-color: #ffffff; border: 2px solid #000000; box-shadow: 5px 5px 15px rgba(0,0,0,0.3);">
+            <div class="modal-header" style="background: #f0f0f0; border-bottom: 2px solid #000000; color: #000000; font-family: 'Times New Roman', Times, serif;">
+                <span id="statement-modal-title" style="font-weight: bold; font-size: 18px;">Financial Statement</span>
+                <button class="modal-close" style="color: #000000;" onclick="closeStatementModal()">X</button>
+            </div>
+            <div class="modal-body" style="overflow-y: auto; max-height: calc(90vh - 100px); padding: 20px; font-family: 'Times New Roman', Times, serif;">
+                <table class="statement-table" id="statement-table">
+                    <thead id="statement-thead"></thead>
+                    <tbody id="statement-tbody"></tbody>
+                </table>
+            </div>
+            <div class="modal-footer" style="background: #f0f0f0; border-top: 2px solid #000000;">
+                <button class="btn btn-secondary" style="border: 1px solid #000000; background-color: #e0e0e0; color: #000000;" onclick="closeStatementModal()">Close</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

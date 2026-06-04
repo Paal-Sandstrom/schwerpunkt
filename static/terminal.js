@@ -59,7 +59,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.location.href = data.url;
                 } else if (data.action === 'chart') {
                     printTerminal(`Rendering chart for ${data.symbol}...`, 'success');
-                    openChartModal(data.symbol, data.data);
+                    openChartModal(data.symbol, data.data, data.period);
+                } else if (data.action === 'statement') {
+                    printTerminal(`Rendering ${data.title}...`, 'success');
+                    openStatementModal(data.title, data.headers, data.rows);
                 } else if (data.action === 'print') {
                     printTerminal(data.text, data.type || 'normal');
                 } else if (data.error) {
@@ -166,4 +169,61 @@ window.saveChartImage = function() {
     link.download = `chart_${Date.now()}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
+}
+
+// --- Modal Statement Logic ---
+window.openStatementModal = function(title, headers, rows) {
+    const modal = document.getElementById('statement-modal');
+    const titleEl = document.getElementById('statement-modal-title');
+    const thead = document.getElementById('statement-thead');
+    const tbody = document.getElementById('statement-tbody');
+    
+    titleEl.textContent = title;
+    
+    // Clear old data
+    thead.innerHTML = '';
+    tbody.innerHTML = '';
+    
+    // Build headers
+    let headerRow = '<tr><th>Metric</th>';
+    for (let h of headers) {
+        headerRow += `<th>${h}</th>`;
+    }
+    headerRow += '</tr>';
+    thead.innerHTML = headerRow;
+    
+    // Build rows
+    for (let row of rows) {
+        let tr = document.createElement('tr');
+        let label = (row[0] || '').toLowerCase();
+        let isTotal = label.includes('total') || label.includes('net income') || label.includes('cash and cash equivalents') || label.includes('gross profit');
+        
+        for (let i = 0; i < row.length; i++) {
+            let td = document.createElement('td');
+            td.textContent = row[i];
+            
+            if (i > 0) {
+                // Numbers
+                td.style.textAlign = 'right';
+                td.style.fontFamily = "'Courier New', Courier, monospace";
+            } else {
+                // Label
+                if (isTotal) td.style.fontWeight = 'bold';
+            }
+            
+            if (isTotal && i > 0) {
+                td.style.borderTop = '1px solid #000000';
+                td.style.borderBottom = '3px double #000000';
+                td.style.fontWeight = 'bold';
+            }
+            tr.appendChild(td);
+        }
+        tbody.appendChild(tr);
+    }
+    
+    modal.style.display = 'flex';
+}
+
+window.closeStatementModal = function() {
+    document.getElementById('statement-modal').style.display = 'none';
 }
