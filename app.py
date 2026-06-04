@@ -1267,7 +1267,11 @@ def ticker_detail(symbol):
                 growth_pct = float(request.args.get('growth', raw['default_growth']))
                 discount_pct = float(request.args.get('discount', 9.0))
                 terminal_pct = float(request.args.get('terminal', 2.5))
-                custom_fcf = float(request.args.get('fcf_base', raw['fcf_base']))
+                custom_fcf_mil = request.args.get('fcf_base')
+                if custom_fcf_mil is not None:
+                    custom_fcf = float(custom_fcf_mil) * 1e6
+                else:
+                    custom_fcf = raw['fcf_base']
                 
                 if growth_pct < -50 or growth_pct > 200: growth_pct = raw['default_growth']
                 if discount_pct < 2 or discount_pct > 30: discount_pct = 9.0
@@ -1278,7 +1282,7 @@ def ticker_detail(symbol):
                     'growth': growth_pct,
                     'discount': discount_pct,
                     'terminal': terminal_pct,
-                    'fcf_base': custom_fcf
+                    'fcf_base': custom_fcf / 1e6
                 }
                 
                 dcf_calc = run_dcf_valuation(

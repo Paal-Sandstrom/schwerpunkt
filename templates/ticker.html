@@ -535,8 +535,8 @@
                             <input type="hidden" name="view" value="dcf">
                             
                             <div class="dcf-form-group">
-                                <div class="dcf-form-label">Base Year FCF (TTM)</div>
-                                <input type="number" name="fcf_base" step="any" value="{{ dcf_params.fcf_base | default(dcf_raw.fcf_base) }}" class="dcf-form-cell" required>
+                                <div class="dcf-form-label" title="Enter value in Millions (e.g. 1000 for 1 Billion)">Base Year FCF (in Millions)</div>
+                                <input type="number" name="fcf_base" step="any" value="{{ dcf_params.fcf_base | default(dcf_raw.fcf_base / 1000000) }}" class="dcf-form-cell" required>
                             </div>
                             
                             <div class="dcf-form-group">
