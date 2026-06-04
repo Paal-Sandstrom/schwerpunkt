@@ -536,7 +536,7 @@
                             
                             <div class="dcf-form-group">
                                 <div class="dcf-form-label">Base Year FCF (TTM)</div>
-                                <input type="number" name="fcf_base" step="any" value="{{ dcf_params.fcf_base | default(data.dcf_raw.fcf_base) }}" class="dcf-form-cell" required>
+                                <input type="number" name="fcf_base" step="any" value="{{ dcf_params.fcf_base | default(dcf_raw.fcf_base) }}" class="dcf-form-cell" required>
                             </div>
                             
                             <div class="dcf-form-group">
