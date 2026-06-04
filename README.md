@@ -30,8 +30,6 @@ python db.py
 4. Run the Flask application:
 ```bash
 python app.py
-# Or run with flask directly:
-flask run
 ```
 
 ## Tech Stack
