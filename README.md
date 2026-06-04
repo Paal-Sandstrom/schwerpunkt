@@ -38,6 +38,3 @@ flask run
 - **Backend:** Python, Flask, SQLite3
 - **Data Source:** `yfinance`
 - **Frontend:** HTML, Vanilla CSS (Web 2.0 aesthetic), JavaScript, Chart.js
-
-## License
-MIT License
