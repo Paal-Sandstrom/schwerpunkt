@@ -1163,7 +1163,8 @@ def ticker_detail(symbol):
                 'Operating Profit Margin (EBIT / Revenue)': format_value(info.get('operatingMargins'), 'pct'),
                 'Return on Equity (ROE)': format_value(info.get('returnOnEquity'), 'pct'),
                 'Return on Assets (ROA)': format_value(info.get('returnOnAssets'), 'pct'),
-                'Dividend Yield': format_value(info.get('dividendYield'), 'pct'),
+                'Dividend Rate': format_value(info.get('dividendRate'), 'currency'),
+                'Dividend Yield': format_value(info.get('dividendYield') / 100 if info.get('dividendYield') else None, 'pct'),
                 'Ex-Dividend Date': format_ex_dividend_date(info.get('exDividendDate')),
             }
             
