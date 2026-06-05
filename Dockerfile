@@ -17,5 +17,5 @@ ENV PORT 8080
 # Initialize the database (if it doesn't exist)
 RUN python db.py
 
-# Run the web service on container startup using gunicorn
-CMD exec gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 8 --timeout 0 app:app
+# Run the web service using the built-in server to test if Gunicorn is the issue
+CMD ["python", "app.py"]
