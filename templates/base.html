@@ -12,18 +12,8 @@
         <!-- Unified Web Header (Early Facebook/Web 2.0 Style) -->
         <header class="web-header">
             <a href="{{ url_for('index') }}" style="text-decoration: none;">
-                <div style="padding: 0px 10px; font-weight: bold; font-size: 32px; color: #3b5998; background-color: transparent; background-image: linear-gradient(rgba(100,100,100,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(100,100,100,0.1) 1px, transparent 1px); background-size: 10px 10px; font-family: Tahoma, Arial, sans-serif; letter-spacing: 1px; text-shadow: 1px 1px 0px rgba(255,255,255,0.8); display: flex; align-items: center; gap: 10px;">
-                    Schwerpunkt
-                    <svg width="40" height="40" viewBox="0 0 100 100" style="filter: drop-shadow(1px 1px 0px rgba(255,255,255,0.8));">
-                        <!-- Main Triangle -->
-                        <polygon points="50,15 90,85 10,85" fill="none" stroke="#3b5998" stroke-width="6" stroke-linejoin="round" />
-                        <!-- Centroid lines -->
-                        <line x1="50" y1="15" x2="50" y2="85" stroke="#3b5998" stroke-width="2.5" opacity="0.6" />
-                        <line x1="10" y1="85" x2="70" y2="50" stroke="#3b5998" stroke-width="2.5" opacity="0.6" />
-                        <line x1="90" y1="85" x2="30" y2="50" stroke="#3b5998" stroke-width="2.5" opacity="0.6" />
-                        <!-- Center point (Schwerpunkt) -->
-                        <circle cx="50" cy="61.7" r="5" fill="#3b5998" />
-                    </svg>
+                <div style="padding: 5px 10px; display: flex; align-items: center;">
+                    <img src="{{ url_for('static', filename='logo.svg') }}" height="60" alt="Schwerpunkt Logo" style="filter: drop-shadow(1px 1px 0px rgba(255,255,255,0.8));">
                 </div>
             </a>
             

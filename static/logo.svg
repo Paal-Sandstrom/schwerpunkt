@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 150" width="800" height="150">
+    <!-- Base styling -->
+    <style>
+        .stroke-dark { stroke: #212554; fill: none; stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+        .stroke-dashed { stroke: #212554; fill: none; stroke-width: 1.5; stroke-dasharray: 6,6; }
+        .fill-dark { fill: #212554; }
+        .text-label { fill: #212554; font-family: Tahoma, Arial, sans-serif; font-size: 14px; font-weight: bold; }
+        .text-logo { fill: #212554; font-family: Tahoma, Arial, sans-serif; font-size: 80px; letter-spacing: 1px; }
+    </style>
+
+    <!-- Crop marks -->
+    <!-- Top Left -->
+    <polyline points="25,10 10,10 10,25" class="stroke-dark"/>
+    <!-- Bottom Left -->
+    <polyline points="25,140 10,140 10,125" class="stroke-dark"/>
+    <!-- Top Right -->
+    <polyline points="135,10 150,10 150,25" class="stroke-dark"/>
+    <!-- Bottom Right -->
+    <polyline points="135,140 150,140 150,125" class="stroke-dark"/>
+
+    <!-- Triangle A(30,120) B(80,30) C(130,120) -->
+    <polygon points="30,120 80,30 130,120" class="stroke-dark"/>
+
+    <!-- Medians -->
+    <!-- Ma is midpoint of BC: (105, 75) -->
+    <!-- Mb is midpoint of AC: (80, 120) -->
+    <!-- Mc is midpoint of AB: (55, 75) -->
+    <!-- Centroid S: (80, 90) -->
+    <line x1="30" y1="120" x2="105" y2="75" class="stroke-dashed"/>
+    <line x1="80" y1="30" x2="80" y2="120" class="stroke-dashed"/>
+    <line x1="130" y1="120" x2="55" y2="75" class="stroke-dashed"/>
+
+    <!-- Centroid Dot S -->
+    <circle cx="80" cy="90" r="4" class="fill-dark"/>
+
+    <!-- Labels -->
+    <text x="15" y="132" class="text-label">A</text>
+    <text x="75" y="22" class="text-label">B</text>
+    <text x="135" y="132" class="text-label">C</text>
+    <text x="112" y="70" class="text-label">Ma</text>
+    <text x="70" y="138" class="text-label">Mb</text>
+    <text x="35" y="70" class="text-label">Mc</text>
+    <text x="82" y="82" class="text-label">S</text>
+
+    <!-- Logo Text -->
+    <text x="180" y="105" class="text-logo">SchwerPunkt</text>
+
+    <!-- Underlines -->
+    <line x1="185" y1="122" x2="660" y2="122" class="stroke-dark"/>
+    <line x1="185" y1="132" x2="660" y2="132" class="stroke-dark"/>
+</svg>
