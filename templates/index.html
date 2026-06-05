@@ -229,27 +229,8 @@
     <div class="box-header" style="background-color: #003366; color: white; padding: 10px 15px; cursor: pointer; text-align: left; font-weight: bold; font-family: Tahoma, Arial, sans-serif; border: 1px solid #002244; margin-bottom: 15px; font-size: 14px; text-transform: uppercase;">
         [ RESEARCH PROJECTS ]
     </div>
-    <div class="box-body" style="padding: 0 15px 15px 15px;">
-        {% if folders %}
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;">
-            {% for folder in folders %}
-                <div onclick="openFolderDossier({{ folder.id }}, '{{ folder.name }}')" style="border: 2px solid #003366; background-color: #ffffff; cursor: pointer;">
-                    <div style="background-color: #e6eaf0; padding: 10px; font-weight: bold; border-bottom: 1px solid #003366; display: flex; justify-content: space-between; align-items: center; font-family: Tahoma, Arial, sans-serif;">
-                        <span style="color: #003366; font-size: 14px;">{{ folder.name }}</span>
-                        <span style="font-size: 11px; color: #003366; background: #fff; padding: 2px 5px; border: 1px solid #003366;">{{ folder.notes|length }} NOTE{% if folder.notes|length != 1 %}S{% endif %}</span>
-                    </div>
-                </div>
-            {% endfor %}
-            </div>
-        {% else %}
-            <div style="padding: 30px; text-align: center; color: #003366; border: 2px solid #003366; background-color: #ffffff; font-family: Tahoma, Arial, sans-serif;">
-                <div style="font-weight: bold; margin-bottom: 5px; font-size: 14px;">[ NO RESEARCH PROJECTS ]</div>
-                <p style="margin: 0; font-size: 12px;">Create your first folder using the terminal to organize your investment thesis.</p>
-                <div style="margin-top: 15px; font-family: 'Courier New', monospace; background-color: #000000; color: #00ff00; padding: 5px 10px; display: inline-block; border: 1px solid #333;">
-                    > mkdir tech-stocks
-                </div>
-            </div>
-        {% endif %}
+    <div class="box-body" style="padding: 0 15px 15px 15px;" id="folders-container">
+        <!-- Folders rendered via JS -->
     </div>
 </div>
 
@@ -340,17 +321,13 @@
         switchFolderTab('notes');
         document.getElementById('folder-notes-container').innerHTML = 'Loading data...';
 
-        try {
-            const res = await fetch(`/api/folder/${folderId}/data`);
-            const data = await res.json();
-            if (data.success) {
-                renderNotes(data.notes);
-                renderSpreadsheet(data.cells);
-            } else {
-                document.getElementById('folder-notes-container').innerHTML = `<div style="color: red;">Error: ${data.error}</div>`;
-            }
-        } catch (e) {
-            document.getElementById('folder-notes-container').innerHTML = `<div style="color: red;">Connection error.</div>`;
+        let folders = JSON.parse(localStorage.getItem('schwerpunkt_folders') || '[]');
+        let folder = folders.find(f => f.id == folderId);
+        if (folder) {
+            renderNotes(folder.notes || []);
+            renderSpreadsheet(folder.cells || []);
+        } else {
+            document.getElementById('folder-notes-container').innerHTML = `<div style="color: red;">Folder not found.</div>`;
         }
     }
 
@@ -544,19 +521,53 @@
 
     async function saveCell(row, col, value) {
         if (!currentFolderId) return;
-        try {
-            await fetch(`/api/folder/${currentFolderId}/spreadsheet`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ row, col, value })
-            });
+        let folders = JSON.parse(localStorage.getItem('schwerpunkt_folders') || '[]');
+        let folder = folders.find(f => f.id == currentFolderId);
+        if (folder) {
+            if (!folder.cells) folder.cells = [];
+            let cell = folder.cells.find(c => c.row_idx == row && c.col_idx == col);
+            if (cell) {
+                cell.cell_value = value;
+            } else {
+                folder.cells.push({ row_idx: row, col_idx: col, cell_value: value });
+            }
+            localStorage.setItem('schwerpunkt_folders', JSON.stringify(folders));
             const status = document.getElementById('sheet-save-status');
             status.style.display = 'inline-block';
             setTimeout(() => { status.style.display = 'none'; }, 1500);
-        } catch (e) {
-            console.error('Save failed', e);
         }
     }
+
+    window.refreshFolderList = function() {
+        const container = document.getElementById('folders-container');
+        let folders = JSON.parse(localStorage.getItem('schwerpunkt_folders') || '[]');
+        
+        if (folders.length > 0) {
+            let html = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;">';
+            folders.forEach(folder => {
+                let noteCount = folder.notes ? folder.notes.length : 0;
+                let s = noteCount !== 1 ? 'S' : '';
+                html += `
+                <div onclick="openFolderDossier(${folder.id}, '${folder.name}')" style="border: 2px solid #003366; background-color: #ffffff; cursor: pointer;">
+                    <div style="background-color: #e6eaf0; padding: 10px; font-weight: bold; border-bottom: 1px solid #003366; display: flex; justify-content: space-between; align-items: center; font-family: Tahoma, Arial, sans-serif;">
+                        <span style="color: #003366; font-size: 14px;">${folder.name}</span>
+                        <span style="font-size: 11px; color: #003366; background: #fff; padding: 2px 5px; border: 1px solid #003366;">${noteCount} NOTE${s}</span>
+                    </div>
+                </div>`;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        } else {
+            container.innerHTML = `
+            <div style="padding: 30px; text-align: center; color: #003366; border: 2px solid #003366; background-color: #ffffff; font-family: Tahoma, Arial, sans-serif;">
+                <div style="font-weight: bold; margin-bottom: 5px; font-size: 14px;">[ NO RESEARCH PROJECTS ]</div>
+                <p style="margin: 0; font-size: 12px;">Create your first folder using the terminal to organize your investment thesis.</p>
+                <div style="margin-top: 15px; font-family: 'Courier New', monospace; background-color: #000000; color: #00ff00; padding: 5px 10px; display: inline-block; border: 1px solid #333;">
+                    > mkdir tech-stocks
+                </div>
+            </div>`;
+        }
+    };
 
     document.addEventListener('DOMContentLoaded', () => {
         const spData = {{ charts.sp500_data | tojson | safe }};
@@ -567,6 +578,7 @@
         if (ruaData && ruaData.length) {
             new StockChart(document.getElementById('russell-chart'), ruaData);
         }
+        window.refreshFolderList();
     });
 </script>
 {% endblock %}

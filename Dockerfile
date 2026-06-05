@@ -14,8 +14,5 @@ COPY . .
 # Expose the dynamic port required by Cloud Run (defaults to 8080)
 ENV PORT 8080
 
-# Initialize the database (if it doesn't exist)
-RUN python db.py
-
 # Run the web service using the built-in server to test if Gunicorn is the issue
 CMD ["python", "app.py"]

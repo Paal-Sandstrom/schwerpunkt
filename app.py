@@ -12,7 +12,6 @@ from flask import Flask, render_template, request, redirect, url_for, flash, jso
 import yfinance as yf
 import pandas as pd
 import requests
-import db
 
 app = Flask(__name__)
 app.secret_key = 'schwerpunkt_secret_key'
@@ -1060,9 +1059,8 @@ def index():
         charts = {'sp500_data': [], 'russell3000_data': []}
         
     try:
-        folders = db.get_folders()
-        for f in folders:
-            f['notes'] = db.get_notes_by_folder(f['id'])[:5]
+        # Folders are now entirely handled by frontend localStorage
+        folders = []
     except Exception as e:
         print(f"DB error: {e}")
         folders = []
@@ -1485,27 +1483,6 @@ def query_ticker():
         
     return redirect(url_for('ticker_detail', symbol=symbol))
 
-@app.route('/api/folder/<int:folder_id>/data', methods=['GET'])
-def get_folder_data(folder_id):
-    try:
-        notes = db.get_notes_by_folder(folder_id)
-        cells = db.get_spreadsheet_data(folder_id)
-        return jsonify({'success': True, 'notes': notes, 'cells': cells})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
-
-@app.route('/api/folder/<int:folder_id>/spreadsheet', methods=['POST'])
-def save_spreadsheet_cell(folder_id):
-    try:
-        data = request.json
-        row = data.get('row')
-        col = data.get('col')
-        value = data.get('value')
-        db.update_spreadsheet_cell(folder_id, row, col, value)
-        return jsonify({'success': True})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
-
 @app.route('/api/terminal', methods=['POST'])
 def terminal_command():
     data = request.json
@@ -1519,111 +1496,6 @@ def terminal_command():
     
     try:
         cmd_lower = cmd.lower()
-        if action == 'mkdir':
-            if len(parts) < 2:
-                return jsonify({'action': 'print', 'text': 'Usage: mkdir <foldername>'})
-            folder_name = parts[1]
-            success, msg = db.create_folder(folder_name)
-            return jsonify({'action': 'print', 'text': msg})
-            
-        elif action == 'cd':
-            if len(parts) < 2 or parts[1] == '..':
-                session.pop('active_folder', None)
-                session.pop('active_folder_id', None)
-                return jsonify({'action': 'cd', 'text': 'Reset to root directory.', 'prompt': '>'})
-            folder_name = parts[1]
-            folder = db.get_folder_by_name(folder_name)
-            if folder:
-                session['active_folder'] = folder['name']
-                session['active_folder_id'] = folder['id']
-                return jsonify({'action': 'cd', 'text': f'Entered folder {folder["name"]}', 'prompt': f'{folder["name"]} >'})
-            return jsonify({'action': 'print', 'text': f'Folder {folder_name} not found.'})
-            
-        elif action == 'cat':
-            if len(parts) < 2:
-                return jsonify({'action': 'print', 'text': 'Usage: cat <note_id>'})
-            note_id = parts[1]
-            if note_id.isdigit():
-                conn = db.get_db()
-                c = conn.cursor()
-                c.execute('SELECT * FROM notes WHERE id = ?', (int(note_id),))
-                n = c.fetchone()
-                conn.close()
-                if n:
-                    sentiment = f"[{n['sentiment'].upper()}]" if n['sentiment'] != 'neutral' else ""
-                    price_str = f"Price @ Creation: ${n['price_at_creation']:.2f}" if n['price_at_creation'] else ""
-                    full_text = f"--- Note {n['id']} ---\nCreated: {n['created_at'][:16]}\nSentiment: {sentiment}\n{price_str}\n\n{n['content']}\n-------------------"
-                    return jsonify({'action': 'print', 'text': full_text})
-            return jsonify({'action': 'print', 'text': f'Note {note_id} not found.'})
-            
-        elif action == 'ls':
-            active_folder_id = session.get('active_folder_id')
-            if not active_folder_id:
-                folders = db.get_folders()
-                if not folders:
-                    return jsonify({'action': 'print', 'text': 'No folders found. Use mkdir <foldername> to create one.'})
-                folder_names = [f["name"] for f in folders]
-                return jsonify({'action': 'print', 'text': "Folders:\n" + "  ".join(folder_names)})
-            else:
-                notes = db.get_notes_by_folder(active_folder_id)
-                if not notes:
-                    return jsonify({'action': 'print', 'text': 'No notes in this folder.'})
-                lines = []
-                for n in notes:
-                    sentiment = f"[{n['sentiment'].upper()}] " if n['sentiment'] != 'neutral' else ""
-                    price_tag = f" (Price @ Creation: ${n['price_at_creation']:.2f})" if n['price_at_creation'] else ""
-                    lines.append(f"Note {n['id']}: {sentiment}{n['content']}{price_tag}")
-                return jsonify({'action': 'print', 'text': "\n".join(lines)})
-                
-        elif action == 'note':
-            active_folder_id = session.get('active_folder_id')
-            if not active_folder_id:
-                return jsonify({'action': 'print', 'text': 'You must be inside a folder to create a note. Use cd <foldername>.'})
-            
-            sentiment = 'neutral'
-            args = parts[1:]
-            if args and args[0] in ['--bullish', '--bearish', '--neutral']:
-                sentiment = args[0].replace('--', '')
-                args = args[1:]
-                
-            # Parse title enclosed in quotes if present
-            title = "UNTITLED NOTE"
-            content = " ".join(args)
-            title_match = re.match(r'^"([^"]+)"\s*(.*)$', content)
-            if title_match:
-                title = title_match.group(1).upper()
-                content = title_match.group(2)
-                
-            if not content and not title_match:
-                return jsonify({'action': 'print', 'text': 'Usage: note [--bullish|--bearish] ["Title"] <content>'})
-                
-            cashtags = re.findall(r'\$([A-Za-z]+)', content)
-            price = None
-            if cashtags:
-                ticker_sym = cashtags[0].upper()
-                try:
-                    info = yf.Ticker(ticker_sym).fast_info
-                    price = info.last_price
-                except:
-                    pass
-            
-            db.create_note(active_folder_id, title, content, sentiment, price)
-            return jsonify({'action': 'print', 'text': f'Note "{title}" saved successfully.'})
-            
-        elif action == 'rm':
-            if len(parts) < 2:
-                return jsonify({'action': 'print', 'text': 'Usage: rm <foldername> or rm <note_id>'})
-            target = parts[1]
-            if target.isdigit():
-                deleted = db.delete_note(int(target))
-                if deleted:
-                    return jsonify({'action': 'print', 'text': f'Deleted note {target}.'})
-            success, msg = db.delete_folder(target)
-            if success and session.get('active_folder') == target:
-                session.pop('active_folder', None)
-                session.pop('active_folder_id', None)
-            return jsonify({'action': 'print', 'text': msg})
-
         if cmd_lower.startswith('balance sheet'):
             parts = cmd.split()
             ticker = parts[-1].upper()

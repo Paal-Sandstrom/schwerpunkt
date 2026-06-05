@@ -63,7 +63,157 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Send to backend
+            // LocalStorage Implementation for Research Projects
+            const parts = cmd.split(' ');
+            const action = parts[0].toLowerCase();
+            
+            let folders = JSON.parse(localStorage.getItem('schwerpunkt_folders') || '[]');
+            let activeFolderId = sessionStorage.getItem('active_folder_id');
+
+            if (['mkdir', 'cd', 'ls', 'note', 'rm', 'cat'].includes(action)) {
+                if (action === 'mkdir') {
+                    if (parts.length < 2) {
+                        printTerminal('Usage: mkdir <foldername>', 'error');
+                        return;
+                    }
+                    const name = parts[1];
+                    if (folders.find(f => f.name === name)) {
+                        printTerminal(`Folder ${name} already exists.`, 'error');
+                        return;
+                    }
+                    folders.push({ id: Date.now(), name: name, created_at: new Date().toISOString() });
+                    localStorage.setItem('schwerpunkt_folders', JSON.stringify(folders));
+                    printTerminal(`Created folder ${name}.`, 'success');
+                    if(window.refreshFolderList) window.refreshFolderList();
+                    return;
+                } else if (action === 'cd') {
+                    if (parts.length < 2 || parts[1] === '..') {
+                        sessionStorage.removeItem('active_folder_id');
+                        currentPrompt = '>';
+                        printTerminal('Reset to root directory.', 'success');
+                        return;
+                    }
+                    const name = parts[1];
+                    const folder = folders.find(f => f.name === name);
+                    if (folder) {
+                        sessionStorage.setItem('active_folder_id', folder.id);
+                        currentPrompt = `${folder.name} >`;
+                        printTerminal(`Entered folder ${folder.name}`, 'success');
+                    } else {
+                        printTerminal(`Folder ${name} not found.`, 'error');
+                    }
+                    return;
+                } else if (action === 'ls') {
+                    if (!activeFolderId) {
+                        if (folders.length === 0) {
+                            printTerminal('No folders found. Use mkdir <foldername> to create one.');
+                        } else {
+                            printTerminal("Folders:\n  " + folders.map(f => f.name).join("  "));
+                        }
+                    } else {
+                        const folder = folders.find(f => f.id == activeFolderId);
+                        if (!folder || !folder.notes || folder.notes.length === 0) {
+                            printTerminal('No notes in this folder.');
+                        } else {
+                            let lines = folder.notes.map(n => {
+                                let sentiment = n.sentiment !== 'neutral' ? `[${n.sentiment.toUpperCase()}] ` : '';
+                                let priceTag = n.price ? ` (Price @ Creation: $${n.price})` : '';
+                                return `Note ${n.id}: ${sentiment}${n.content}${priceTag}`;
+                            });
+                            printTerminal(lines.join('\n'));
+                        }
+                    }
+                    return;
+                } else if (action === 'note') {
+                    if (!activeFolderId) {
+                        printTerminal('You must be inside a folder to create a note. Use cd <foldername>.', 'error');
+                        return;
+                    }
+                    let sentiment = 'neutral';
+                    let args = parts.slice(1);
+                    if (args.length > 0 && ['--bullish', '--bearish', '--neutral'].includes(args[0])) {
+                        sentiment = args[0].replace('--', '');
+                        args = args.slice(1);
+                    }
+                    let content = args.join(" ");
+                    let title = "UNTITLED NOTE";
+                    let titleMatch = content.match(/^"([^"]+)"\s*(.*)$/);
+                    if (titleMatch) {
+                        title = titleMatch[1].toUpperCase();
+                        content = titleMatch[2];
+                    }
+                    if (!content && !titleMatch) {
+                        printTerminal('Usage: note [--bullish|--bearish] ["Title"] <content>', 'error');
+                        return;
+                    }
+                    let folderIndex = folders.findIndex(f => f.id == activeFolderId);
+                    if (folderIndex !== -1) {
+                        if (!folders[folderIndex].notes) folders[folderIndex].notes = [];
+                        folders[folderIndex].notes.push({
+                            id: Date.now(),
+                            title: title,
+                            content: content,
+                            sentiment: sentiment,
+                            price: null, // Cashtag pricing requires backend, disabled for privacy
+                            created_at: new Date().toISOString().slice(0,16)
+                        });
+                        localStorage.setItem('schwerpunkt_folders', JSON.stringify(folders));
+                        printTerminal(`Note "${title}" saved successfully.`, 'success');
+                        if(window.refreshFolderList) window.refreshFolderList();
+                        if(window.currentFolderId == activeFolderId && window.openFolderDossier) window.openFolderDossier(folders[folderIndex].id, folders[folderIndex].name);
+                    }
+                    return;
+                } else if (action === 'rm') {
+                    if (parts.length < 2) {
+                        printTerminal('Usage: rm <foldername> or rm <note_id>', 'error');
+                        return;
+                    }
+                    const target = parts[1];
+                    if (isNaN(target)) { // Delete folder
+                        const initialLength = folders.length;
+                        folders = folders.filter(f => f.name !== target);
+                        if (folders.length < initialLength) {
+                            localStorage.setItem('schwerpunkt_folders', JSON.stringify(folders));
+                            printTerminal(`Deleted folder ${target} and its notes.`, 'success');
+                            if(window.refreshFolderList) window.refreshFolderList();
+                        } else {
+                            printTerminal(`Folder ${target} not found.`, 'error');
+                        }
+                    } else { // Delete note
+                        if (activeFolderId) {
+                            let folder = folders.find(f => f.id == activeFolderId);
+                            if (folder && folder.notes) {
+                                folder.notes = folder.notes.filter(n => n.id != target);
+                                localStorage.setItem('schwerpunkt_folders', JSON.stringify(folders));
+                                printTerminal(`Deleted note ${target}.`, 'success');
+                                if(window.refreshFolderList) window.refreshFolderList();
+                                if(window.currentFolderId == activeFolderId && window.openFolderDossier) window.openFolderDossier(folder.id, folder.name);
+                            }
+                        } else {
+                            printTerminal('Enter a folder first to delete a note.', 'error');
+                        }
+                    }
+                    return;
+                } else if (action === 'cat') {
+                     if (parts.length < 2) {
+                        printTerminal('Usage: cat <note_id>', 'error');
+                        return;
+                    }
+                    const noteId = parts[1];
+                    let foundNote = null;
+                    folders.forEach(f => { if(f.notes) { let n = f.notes.find(x => x.id == noteId); if(n) foundNote = n; } });
+                    if (foundNote) {
+                        let sent = foundNote.sentiment !== 'neutral' ? `[${foundNote.sentiment.toUpperCase()}]` : '';
+                        let text = `--- Note ${foundNote.id} ---\nCreated: ${foundNote.created_at}\nSentiment: ${sent}\n\n${foundNote.content}\n-------------------`;
+                        printTerminal(text);
+                    } else {
+                        printTerminal(`Note ${noteId} not found.`, 'error');
+                    }
+                    return;
+                }
+            }
+
+            // Send financial commands to backend
             try {
                 const response = await fetch('/api/terminal', {
                     method: 'POST',
