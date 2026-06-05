@@ -1473,6 +1473,10 @@ def index_constituents(index_id):
 def model_builder_view():
     return render_template('model_builder.html')
 
+@app.route('/guide')
+def guide_view():
+    return render_template('guide.html')
+
 @app.route('/query', methods=['GET', 'POST'])
 def query_ticker():
     """Redirect user search input to target stock ticker route."""
@@ -1590,6 +1594,8 @@ def terminal_command():
                 return jsonify({'action': 'redirect', 'url': url_for('index_constituents', index_id='sp500')})
             elif target == 'model builder':
                 return jsonify({'action': 'redirect', 'url': url_for('model_builder_view')})
+            elif target == 'guide':
+                return jsonify({'action': 'redirect', 'url': url_for('guide_view')})
             else:
                 ticker = parts[1].upper()
                 return jsonify({'action': 'redirect', 'url': url_for('ticker_detail', symbol=ticker)})

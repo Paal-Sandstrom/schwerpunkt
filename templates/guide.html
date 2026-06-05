@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}User Guide - Schwerpunkt Stock Terminal{% endblock %}
+
+{% block content %}
+<div class="box">
+    <div class="box-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <span>SCHWERPUNKT TERMINAL GUIDE</span>
+    </div>
+    <div class="box-body" style="padding: 20px;">
+        <h2 style="color: #003366; font-family: Tahoma, Arial, sans-serif; font-size: 18px; border-bottom: 2px solid #003366; padding-bottom: 5px; margin-top: 0;">1. OVERVIEW</h2>
+        <p style="font-family: Tahoma, Arial, sans-serif; font-size: 13px; color: #333; line-height: 1.5;">
+            Schwerpunkt is an interactive equity research terminal inspired by Web 2.0 aesthetics and professional trading systems. 
+            It combines a graphical user interface (GUI) with a powerful command-line terminal, allowing users to seamlessly transition 
+            between viewing high-level market data and diving deep into specific financial statements using quick keyboard commands.
+        </p>
+
+        <h2 style="color: #003366; font-family: Tahoma, Arial, sans-serif; font-size: 18px; border-bottom: 2px solid #003366; padding-bottom: 5px; margin-top: 30px;">2. MAIN FEATURES</h2>
+        
+        <table class="data-table" style="margin-bottom: 20px;">
+            <thead>
+                <tr class="statement-header-row">
+                    <th style="width: 25%;">Feature</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-bold">Home</td>
+                    <td>The Market Home page provides a high-level overview of US Market Indices (S&P 500, Russell 3000, Nasdaq, Dow Jones) with performance charts, sector heatmaps, and daily market movers (gainers/losers).</td>
+                </tr>
+                <tr>
+                    <td class="text-bold">Indices</td>
+                    <td>A detailed breakdown of index constituents. View sector concentration, top holdings, and individual stock performance for major indices.</td>
+                </tr>
+                <tr>
+                    <td class="text-bold">Model Builder</td>
+                    <td>A global workspace for comparing multiple stocks. Add custom tickers and metrics (e.g., P/E, Revenue, Dividend Yield) to build a comparative valuation model. The table auto-saves to your local browser and can be exported as a CSV.</td>
+                </tr>
+                <tr>
+                    <td class="text-bold">Stock Dossier</td>
+                    <td>Accessible by searching a ticker or clicking any stock link. Displays comprehensive fundamental data, business summaries, and three-year historical financial statements (Income, Balance Sheet, Cash Flow).</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2 style="color: #003366; font-family: Tahoma, Arial, sans-serif; font-size: 18px; border-bottom: 2px solid #003366; padding-bottom: 5px; margin-top: 30px;">3. TERMINAL COMMANDS</h2>
+        <p style="font-family: Tahoma, Arial, sans-serif; font-size: 13px; color: #333; line-height: 1.5; margin-bottom: 15px;">
+            The interactive terminal (located on the right sidebar) is your fastest way to navigate the app and pull data. Press the terminal input box and type <code>help</code> to see these commands at any time.
+        </p>
+
+        <div style="background: #e6eaf0; border: 1px solid #003366; padding: 15px; font-family: 'Courier New', monospace; font-size: 12px; color: #003366; margin-bottom: 20px;">
+            <div style="font-weight: bold; margin-bottom: 10px;">[ FINANCIAL LOOKUPS ]</div>
+            <div style="margin-bottom: 5px;">> <span style="font-weight: bold;">balance sheet [ticker]</span> : Open balance sheet in the dossier</div>
+            <div style="margin-bottom: 5px;">> <span style="font-weight: bold;">income statement [ticker]</span> : Open income statement in the dossier</div>
+            <div style="margin-bottom: 5px;">> <span style="font-weight: bold;">cash flow [ticker]</span> : Open cash flow statement in the dossier</div>
+            <div style="margin-bottom: 5px;">> <span style="font-weight: bold;">chart [ticker]</span> : Open interactive chart for ticker</div>
+            <div style="margin-bottom: 5px;">> <span style="font-weight: bold;">price [ticker]</span> : Get current price info directly in the terminal</div>
+            <div style="margin-bottom: 5px;">> <span style="font-weight: bold;">pe [ticker]</span> : Get P/E ratio directly in the terminal</div>
+            <div style="margin-bottom: 15px;">> <span style="font-weight: bold;">[metric] [year] [ticker]</span> : Search any financial metric (e.g., 'revenue 2023 aapl')</div>
+
+            <div style="font-weight: bold; margin-bottom: 10px;">[ RESEARCH FOLDERS ]</div>
+            <div style="margin-bottom: 5px;">> <span style="font-weight: bold;">mkdir [name]</span> : Create a new research folder</div>
+            <div style="margin-bottom: 5px;">> <span style="font-weight: bold;">cd [name]</span> : Enter a research folder (or 'cd ..' to exit)</div>
+            <div style="margin-bottom: 5px;">> <span style="font-weight: bold;">ls</span> : List notes in current folder</div>
+            <div style="margin-bottom: 5px;">> <span style="font-weight: bold;">note ["Title"] [text]</span> : Add a note to the current folder (Note: include $TICKER to link a stock)</div>
+            <div style="margin-bottom: 5px;">> <span style="font-weight: bold;">cat [id]</span> : View full contents of a note</div>
+            <div style="margin-bottom: 15px;">> <span style="font-weight: bold;">rm [name]</span> : Delete a research folder</div>
+
+            <div style="font-weight: bold; margin-bottom: 10px;">[ SYSTEM ]</div>
+            <div style="margin-bottom: 5px;">> <span style="font-weight: bold;">nav [target]</span> : Navigate main window (Targets: home, indices, model builder, or any TICKER)</div>
+            <div style="margin-bottom: 5px;">> <span style="font-weight: bold;">clear</span> : Clear terminal output</div>
+            <div style="margin-bottom: 5px;">> <span style="font-weight: bold;">/panic</span> : Emergency UI reset command</div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

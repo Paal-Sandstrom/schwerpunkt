@@ -35,6 +35,7 @@
                 {% endif %}
                 <a href="{{ url_for('index_constituents', index_id='sp500') }}" class="web-nav-link {% if request.path.startswith('/index-constituents/') %}active{% endif %}">Indices</a>
                 <a href="{{ url_for('model_builder_view') }}" class="web-nav-link {% if request.path == '/model-builder' %}active{% endif %}">Model Builder</a>
+                <a href="{{ url_for('guide_view') }}" class="web-nav-link {% if request.path == '/guide' %}active{% endif %}">Guide</a>
             </nav>
 
             <div class="web-search-box">
