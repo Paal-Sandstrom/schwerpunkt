@@ -48,6 +48,7 @@
 <div class="subview-tabs">
     <a href="{{ url_for('ticker_detail', symbol=symbol, view='overview') }}" class="subview-tab-item {% if view == 'overview' %}active{% endif %}">Overview</a>
     <a href="{{ url_for('ticker_detail', symbol=symbol, view='financials') }}" class="subview-tab-item {% if view == 'financials' %}active{% endif %}">Financial Statements</a>
+    <a href="{{ url_for('ticker_detail', symbol=symbol, view='metrics') }}" class="subview-tab-item {% if view == 'metrics' %}active{% endif %}">Metrics History</a>
     <a href="{{ url_for('ticker_detail', symbol=symbol, view='dcf') }}" class="subview-tab-item {% if view == 'dcf' %}active{% endif %}">DCF Valuation</a>
 </div>
 
@@ -513,6 +514,177 @@
                 }
             </script>
 
+
+        <!-- ========================================== -->
+        <!-- VIEW: METRICS HISTORY                      -->
+        <!-- ========================================== -->
+        {% elif view == 'metrics' %}
+            
+            <div class="box">
+                <div class="box-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>HISTORICAL METRICS (QUARTERLY)</span>
+                    <select id="metric-selector" style="padding: 4px; font-size: 11px;">
+                        <option value="Revenue">Revenue</option>
+                        <option value="Net Income">Net Income</option>
+                        <option value="EBIT">EBIT</option>
+                        <option value="Operating Cash Flow">Operating Cash Flow</option>
+                        <option value="Free Cash Flow">Free Cash Flow</option>
+                        <option value="Operating Margin">Operating Margin</option>
+                    </select>
+                </div>
+                <div class="box-body" style="background-color: #ffffff; padding: 15px;">
+                    <div id="metrics-loading" style="text-align: center; padding: 50px 0; color: #888;">Loading historical data...</div>
+                    <div id="metrics-error" style="display: none; text-align: center; padding: 50px 0; color: #c00;"></div>
+                    
+                    <div id="metrics-content" style="display: none;">
+                        <div style="position: relative; height: 320px; width: 100%; margin-bottom: 20px;">
+                            <canvas id="metrics-chart" style="display: block;"></canvas>
+                        </div>
+                        
+                        <div class="section-title" style="margin-top: 15px;">Metric Statistics</div>
+                        <table class="data-table">
+                            <thead>
+                                <tr class="statement-header-row">
+                                    <th>Average Value</th>
+                                    <th>Standard Deviation</th>
+                                    <th>Latest YoY Change</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="stat-avg" class="text-bold">-</td>
+                                    <td id="stat-std">-</td>
+                                    <td id="stat-change" class="text-bold">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const ticker = '{{ symbol }}';
+                    let metricsData = null;
+                    let chartInstance = null;
+
+                    fetch('/api/historical_metrics', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ticker: ticker })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        document.getElementById('metrics-loading').style.display = 'none';
+                        if (data.error) {
+                            const errDiv = document.getElementById('metrics-error');
+                            errDiv.innerText = data.error;
+                            errDiv.style.display = 'block';
+                            return;
+                        }
+                        metricsData = data;
+                        document.getElementById('metrics-content').style.display = 'block';
+                        renderMetric('Revenue');
+                    })
+                    .catch(err => {
+                        document.getElementById('metrics-loading').style.display = 'none';
+                        const errDiv = document.getElementById('metrics-error');
+                        errDiv.innerText = 'Error fetching data: ' + err.message;
+                        errDiv.style.display = 'block';
+                    });
+
+                    document.getElementById('metric-selector').addEventListener('change', (e) => {
+                        if (metricsData) {
+                            renderMetric(e.target.value);
+                        }
+                    });
+
+                    function formatNum(val, isPct) {
+                        if (val === null || val === undefined || isNaN(val)) return 'N/A';
+                        if (isPct) {
+                            return (val * 100).toFixed(2) + '%';
+                        }
+                        if (Math.abs(val) >= 1e9) return '$' + (val / 1e9).toFixed(2) + 'B';
+                        if (Math.abs(val) >= 1e6) return '$' + (val / 1e6).toFixed(2) + 'M';
+                        return '$' + val.toLocaleString();
+                    }
+
+                    function renderMetric(metricName) {
+                        if (!metricsData[metricName] || !metricsData[metricName].data) return;
+
+                        const isPct = (metricName === 'Operating Margin');
+                        const mData = metricsData[metricName].data;
+                        const stats = metricsData[metricName].stats;
+
+                        // Update Stats Table
+                        document.getElementById('stat-avg').innerText = formatNum(stats.avg, isPct);
+                        document.getElementById('stat-std').innerText = formatNum(stats.std, isPct);
+                        
+                        const changeCell = document.getElementById('stat-change');
+                        if (stats.avg_change !== null) {
+                            const changePct = (stats.avg_change * 100).toFixed(2) + '%';
+                            changeCell.innerText = (stats.avg_change > 0 ? '+' : '') + changePct;
+                            changeCell.className = stats.avg_change > 0 ? 'text-green text-bold' : 'text-red text-bold';
+                        } else {
+                            changeCell.innerText = 'N/A';
+                            changeCell.className = 'text-bold';
+                        }
+
+                        // Chart
+                        const labels = mData.map(d => d.date);
+                        const values = mData.map(d => d.value);
+
+                        const ctx = document.getElementById('metrics-chart').getContext('2d');
+                        if (chartInstance) {
+                            chartInstance.destroy();
+                        }
+
+                        chartInstance = new Chart(ctx, {
+                            type: isPct ? 'line' : 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: metricName,
+                                    data: values,
+                                    backgroundColor: isPct ? 'rgba(59, 89, 152, 0.1)' : '#3b5998',
+                                    borderColor: '#3b5998',
+                                    borderWidth: 2,
+                                    fill: isPct,
+                                    tension: 0.1,
+                                    pointBackgroundColor: '#3b5998',
+                                    pointRadius: isPct ? 4 : 0
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { display: false },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                let val = context.raw;
+                                                return isPct ? (val * 100).toFixed(2) + '%' : formatNum(val, false);
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: !isPct,
+                                        ticks: {
+                                            callback: function(value) {
+                                                return isPct ? (value * 100).toFixed(0) + '%' : formatNum(value, false);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+            </script>
 
         <!-- ========================================== -->
         <!-- VIEW: DISCOUNTED CASH FLOW VALUATION       -->

@@ -45,9 +45,11 @@
 
                 <!-- Pagination Controls -->
                 <div id="pagination-controls" style="margin-top: 15px; display: flex; justify-content: center; align-items: center; gap: 10px; font-size: 11px;">
-                    <button id="btn-prev" class="btn btn-secondary pagination-btn">« Prev</button>
+                    <button id="btn-first" class="btn btn-secondary pagination-btn">« First</button>
+                    <button id="btn-prev" class="btn btn-secondary pagination-btn">‹ Prev</button>
                     <span id="page-indicator" style="font-weight: bold; color: #555;">Page 1 of 1</span>
-                    <button id="btn-next" class="btn btn-secondary pagination-btn">Next »</button>
+                    <button id="btn-next" class="btn btn-secondary pagination-btn">Next ›</button>
+                    <button id="btn-last" class="btn btn-secondary pagination-btn">Last »</button>
                 </div>
             </div>
         </div>
@@ -190,8 +192,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const tbody = document.getElementById('constituents-tbody');
     const pageIndicator = document.getElementById('page-indicator');
     const countIndicator = document.getElementById('constituents-count');
+    const btnFirst = document.getElementById('btn-first');
     const btnPrev = document.getElementById('btn-prev');
     const btnNext = document.getElementById('btn-next');
+    const btnLast = document.getElementById('btn-last');
     
     const pageSize = 50;
     let currentPage = 1;
@@ -233,14 +237,19 @@ document.addEventListener('DOMContentLoaded', function() {
         countIndicator.textContent = `Showing ${filteredStocks.length} of ${allStocks.length} stocks`;
         
         // Enable/Disable pagination buttons
-        btnPrev.disabled = (currentPage === 1);
-        btnNext.disabled = (currentPage === totalPages);
+        btnFirst.disabled = btnPrev.disabled = (currentPage === 1);
+        btnLast.disabled = btnNext.disabled = (currentPage === totalPages);
         
         // Styling disabled state
-        btnPrev.style.opacity = (currentPage === 1) ? '0.5' : '1.0';
-        btnPrev.style.cursor = (currentPage === 1) ? 'default' : 'pointer';
-        btnNext.style.opacity = (currentPage === totalPages) ? '0.5' : '1.0';
-        btnNext.style.cursor = (currentPage === totalPages) ? 'default' : 'pointer';
+        const firstPrevStyle = (currentPage === 1) ? '0.5' : '1.0';
+        const firstPrevCursor = (currentPage === 1) ? 'default' : 'pointer';
+        const nextLastStyle = (currentPage === totalPages) ? '0.5' : '1.0';
+        const nextLastCursor = (currentPage === totalPages) ? 'default' : 'pointer';
+
+        btnFirst.style.opacity = btnPrev.style.opacity = firstPrevStyle;
+        btnFirst.style.cursor = btnPrev.style.cursor = firstPrevCursor;
+        btnNext.style.opacity = btnLast.style.opacity = nextLastStyle;
+        btnNext.style.cursor = btnLast.style.cursor = nextLastCursor;
     }
     
     // Keypress filter event
@@ -261,6 +270,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Click page events
+    btnFirst.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage = 1;
+            updateList();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+
     btnPrev.addEventListener('click', () => {
         if (currentPage > 1) {
             currentPage--;
@@ -273,6 +290,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const totalPages = Math.ceil(filteredStocks.length / pageSize);
         if (currentPage < totalPages) {
             currentPage++;
+            updateList();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+
+    btnLast.addEventListener('click', () => {
+        const totalPages = Math.ceil(filteredStocks.length / pageSize);
+        if (currentPage < totalPages) {
+            currentPage = totalPages;
             updateList();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }

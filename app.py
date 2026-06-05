@@ -11,6 +11,7 @@ from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 import yfinance as yf
 import pandas as pd
+import numpy as np
 import requests
 
 app = Flask(__name__)
@@ -1098,7 +1099,7 @@ def ticker_detail(symbol):
     
     if period not in ['1mo', '3mo', '6mo', '1y', '5y', 'max']:
         period = '1y'
-    if view not in ['overview', 'financials', 'dcf']:
+    if view not in ['overview', 'financials', 'metrics', 'dcf']:
         view = 'overview'
     if stmt not in ['income', 'balance', 'cashflow']:
         stmt = 'income'
@@ -1158,7 +1159,6 @@ def ticker_detail(symbol):
                 'Forward P/E': format_value(info.get('forwardPE'), 'ratio'),
                 'Price-to-Book (P/B)': format_value(info.get('priceToBook'), 'ratio'),
                 'Price-to-Sales (P/S)': format_value(info.get('priceToSalesTrailing12Months'), 'ratio'),
-                'Debt-to-Equity': format_value(info.get('debtToEquity'), 'debt_equity'),
                 'Net Profit Margin (Net Income / Revenue)': format_value(info.get('profitMargins'), 'pct'),
                 'Operating Profit Margin (EBIT / Revenue)': format_value(info.get('operatingMargins'), 'pct'),
                 'Return on Equity (ROE)': format_value(info.get('returnOnEquity'), 'pct'),
@@ -1751,6 +1751,87 @@ def financial_data():
         except:
             result[t] = { 'error': 'Failed to fetch data' }
     return jsonify({'success': True, 'data': result})
+
+@app.route('/api/historical_metrics', methods=['POST'])
+def historical_metrics_api():
+    data = request.json
+    ticker = data.get('ticker', '').strip().upper()
+    if not ticker:
+        return jsonify({'error': 'No ticker provided'})
+        
+    stock = yf.Ticker(ticker)
+    q_fin = stock.quarterly_financials
+    q_cf = stock.quarterly_cashflow
+
+    if q_fin.empty and q_cf.empty:
+        return jsonify({'error': 'No quarterly data found for this ticker.'})
+
+    # Transpose so rows are dates, then sort oldest to newest
+    q_fin = q_fin.T.sort_index() if not q_fin.empty else pd.DataFrame()
+    q_cf = q_cf.T.sort_index() if not q_cf.empty else pd.DataFrame()
+
+    def get_series(df, keys):
+        for k in keys:
+            if k in df.columns:
+                return df[k]
+        return pd.Series(index=df.index, dtype=float)
+
+    rev = get_series(q_fin, ['Total Revenue', 'Operating Revenue'])
+    ni = get_series(q_fin, ['Net Income', 'Net Income Common Stockholders', 'Net Income Continuous Operations'])
+    ebit = get_series(q_fin, ['EBIT', 'Operating Income'])
+    ocf = get_series(q_cf, ['Operating Cash Flow', 'Cash Flow From Operating Activities'])
+    fcf = get_series(q_cf, ['Free Cash Flow'])
+
+    margin = pd.Series(index=rev.index, dtype=float)
+    if not rev.empty and not ebit.empty:
+        margin_arr = np.where(rev != 0, ebit / rev, np.nan)
+        margin = pd.Series(margin_arr, index=rev.index)
+
+    def process_metric(series, is_pct=False):
+        if series.isna().all():
+            return []
+        series = series.dropna()
+        
+        data_points = []
+        for date, val in series.items():
+            if isinstance(date, pd.Timestamp):
+                date_str = f"Q{(date.month-1)//3 + 1} '{date.strftime('%y')}"
+            else:
+                date_str = str(date)
+            data_points.append({'date': date_str, 'value': float(val)})
+
+        if len(data_points) == 0:
+            return []
+
+        vals = np.array([dp['value'] for dp in data_points])
+        avg_val = float(np.mean(vals))
+        std_dev = float(np.std(vals))
+        
+        yoy_change = None
+        if len(vals) >= 5:
+            # YoY change between the most recent quarter and the quarter 1 year ago (4 quarters prior)
+            if vals[-5] != 0:
+                yoy_change = float((vals[-1] - vals[-5]) / abs(vals[-5]))
+
+        return {
+            'data': data_points,
+            'stats': {
+                'avg': avg_val,
+                'std': std_dev,
+                'avg_change': yoy_change
+            }
+        }
+
+    res = {
+        'Revenue': process_metric(rev),
+        'Net Income': process_metric(ni),
+        'EBIT': process_metric(ebit),
+        'Operating Cash Flow': process_metric(ocf),
+        'Free Cash Flow': process_metric(fcf),
+        'Operating Margin': process_metric(margin, is_pct=True)
+    }
+    
+    return jsonify(res)
 
 if __name__ == '__main__':
     # Binding to the dynamic port required by Cloud Run environment rules

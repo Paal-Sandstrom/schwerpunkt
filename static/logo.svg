@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 150" width="800" height="150">
     <!-- Base styling -->
     <style>
-        .stroke-dark { stroke: #212554; fill: none; stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
-        .stroke-dashed { stroke: #212554; fill: none; stroke-width: 1.5; stroke-dasharray: 6,6; }
-        .fill-dark { fill: #212554; }
-        .text-label { fill: #212554; font-family: Tahoma, Arial, sans-serif; font-size: 14px; font-weight: bold; }
-        .text-logo { fill: #212554; font-family: Tahoma, Arial, sans-serif; font-size: 80px; letter-spacing: 1px; }
+        .stroke-dark { stroke: #3b5998; fill: none; stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+        .stroke-dashed { stroke: #3b5998; fill: none; stroke-width: 1.5; stroke-dasharray: 6,6; }
+        .fill-dark { fill: #3b5998; }
+        .text-label { fill: #3b5998; font-family: Tahoma, Arial, sans-serif; font-size: 14px; font-weight: bold; }
+        .text-logo { fill: #3b5998; font-family: Tahoma, Arial, sans-serif; font-size: 80px; letter-spacing: 1px; }
     </style>
 
     <!-- Crop marks -->
@@ -43,7 +43,7 @@
     <text x="82" y="82" class="text-label">S</text>
 
     <!-- Logo Text -->
-    <text x="180" y="105" class="text-logo">SchwerPunkt</text>
+    <text x="180" y="105" class="text-logo">Schwerpunkt</text>
 
     <!-- Underlines -->
     <line x1="185" y1="122" x2="660" y2="122" class="stroke-dark"/>
