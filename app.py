@@ -1457,7 +1457,6 @@ def index_constituents(index_id):
 
     query_time = f"{(time.time() - start_time):.3f}s"
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
     return render_template(
         'constituents.html',
         index_id=index_id,
@@ -1469,6 +1468,10 @@ def index_constituents(index_id):
         query_time=query_time,
         current_time=current_time
     )
+
+@app.route('/model-builder')
+def model_builder_view():
+    return render_template('model_builder.html')
 
 @app.route('/query', methods=['GET', 'POST'])
 def query_ticker():
@@ -1580,8 +1583,16 @@ def terminal_command():
             return jsonify({'action': 'print', 'text': help_text})
             
         elif action == 'nav' and len(parts) > 1:
-            ticker = parts[1].upper()
-            return jsonify({'action': 'redirect', 'url': url_for('ticker_detail', symbol=ticker)})
+            target = " ".join(parts[1:]).lower()
+            if target in ['home', 'market home']:
+                return jsonify({'action': 'redirect', 'url': url_for('index')})
+            elif target == 'indices' or target == 'index constituents':
+                return jsonify({'action': 'redirect', 'url': url_for('index_constituents', index_id='sp500')})
+            elif target == 'model builder':
+                return jsonify({'action': 'redirect', 'url': url_for('model_builder_view')})
+            else:
+                ticker = parts[1].upper()
+                return jsonify({'action': 'redirect', 'url': url_for('ticker_detail', symbol=ticker)})
             
         elif action == 'price' and len(parts) > 1:
             ticker = parts[1].upper()
@@ -1696,6 +1707,44 @@ def terminal_command():
             
     except Exception as e:
         return jsonify({'error': str(e)})
+
+@app.route('/api/financial_data', methods=['POST'])
+def financial_data():
+    data = request.json
+    tickers = data.get('tickers', [])
+    result = {}
+    for t in tickers:
+        if not t: continue
+        t = t.upper()
+        try:
+            stock = yf.Ticker(t)
+            info = stock.info
+            fast_info = stock.fast_info
+            
+            # Determine price safely
+            price = "N/A"
+            try:
+                price = f"${fast_info.last_price:.2f}"
+            except:
+                if info.get('currentPrice'):
+                    price = f"${info.get('currentPrice'):.2f}"
+                    
+            result[t] = {
+                'price': price,
+                'pe': format_value(info.get('trailingPE'), 'ratio'),
+                'fwd_pe': format_value(info.get('forwardPE'), 'ratio'),
+                'market_cap': format_value(info.get('marketCap'), 'currency'),
+                'revenue': format_value(info.get('totalRevenue'), 'currency'),
+                'net_income': format_value(info.get('netIncomeToCommon'), 'currency'),
+                'dividend_yield': format_value(info.get('dividendYield') / 100 if info.get('dividendYield') else None, 'pct'),
+                'dividend_rate': format_value(info.get('dividendRate'), 'currency'),
+                'profit_margin': format_value(info.get('profitMargins'), 'pct'),
+                'roa': format_value(info.get('returnOnAssets'), 'pct'),
+                'roe': format_value(info.get('returnOnEquity'), 'pct'),
+            }
+        except:
+            result[t] = { 'error': 'Failed to fetch data' }
+    return jsonify({'success': True, 'data': result})
 
 if __name__ == '__main__':
     # Binding to the dynamic port required by Cloud Run environment rules

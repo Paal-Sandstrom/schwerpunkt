@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block title %}Model Builder - Schwerpunkt Stock Terminal{% endblock %}
+
+{% block content %}
+<div class="box">
+    <div class="box-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <span>MODEL BUILDER (GLOBAL)</span>
+        <button onclick="downloadModelBuilderCSV()" class="model-builder-btn" style="background: #008800; border-color: #005500; font-size: 11px; padding: 2px 6px;">DOWNLOAD CSV</button>
+    </div>
+    <div class="box-body" style="padding: 15px;">
+        <div style="margin-bottom: 15px; display: flex; justify-content: flex-start; align-items: center; background: #f0f7ff; padding: 10px; border: 1px solid #003366;">
+            <input type="text" id="mb-ticker-input" placeholder="Ticker (e.g. AAPL)" class="model-builder-input" style="width: 120px;" onkeypress="if(event.key === 'Enter') addModelBuilderTicker()">
+            <button onclick="addModelBuilderTicker()" class="model-builder-btn" style="margin-right: 15px;">ADD TICKER</button>
+            
+            <span style="margin: 0 15px 0 0; color: #003366; font-weight: bold;">|</span>
+            
+            <select id="mb-metric-input" class="model-builder-input" style="width: 150px;">
+                <option value="price">Price</option>
+                <option value="pe">P/E Ratio</option>
+                <option value="fwd_pe">Forward P/E</option>
+                <option value="market_cap">Market Cap</option>
+                <option value="revenue">Revenue</option>
+                <option value="net_income">Net Income</option>
+                <option value="dividend_yield">Dividend Yield</option>
+                <option value="dividend_rate">Dividend Rate</option>
+                <option value="profit_margin">Profit Margin</option>
+                <option value="roa">ROA</option>
+                <option value="roe">ROE</option>
+            </select>
+            <button onclick="addModelBuilderMetric()" class="model-builder-btn">ADD METRIC</button>
+        </div>
+        
+        <div style="overflow: auto; border: 2px solid #003366; background: #fff;">
+            <table id="model-table" class="data-table" style="min-width: 100%;">
+                <!-- JS will generate grid -->
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const STORAGE_KEY = 'schwerpunkt_global_model_builder';
+
+    function getMBState() {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { tickers: [], metrics: ['price', 'pe', 'market_cap'] };
+    }
+
+    function setMBState(state) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    async function renderModelBuilder() {
+        const mbState = getMBState();
+        const table = document.getElementById('model-table');
+        
+        if (!mbState.tickers || mbState.tickers.length === 0) {
+            table.innerHTML = `<tr><td style="text-align:center; padding:40px; color:#888;">Add a ticker to start building your model.</td></tr>`;
+            return;
+        }
+
+        table.innerHTML = `<tr><td style="text-align:center; padding:20px;">Loading data...</td></tr>`;
+
+        let liveData = {};
+        try {
+            const res = await fetch('/api/financial_data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tickers: mbState.tickers })
+            });
+            const data = await res.json();
+            if (data.success) {
+                liveData = data.data;
+            } else {
+                console.error("API error:", data.error);
+            }
+        } catch (e) {
+            console.error("Fetch error:", e);
+        }
+
+        const metrics = mbState.metrics || [];
+        
+        // Build Header
+        let thead = '<thead><tr class="statement-header-row"><th style="width: 100px;">Metric</th>';
+        mbState.tickers.forEach((ticker, idx) => {
+            thead += `<th style="text-align: right;">${ticker} <button onclick="removeModelBuilderTicker(${idx})" style="background: none; border: none; color: #cc0000; font-weight: bold; cursor: pointer; padding: 0 4px; font-size: 10px;">X</button></th>`;
+        });
+        thead += '</tr></thead>';
+
+        // Build Body Rows
+        let tbody = '<tbody>';
+        const LABELS = {
+            'pe': 'P/E Ratio',
+            'fwd_pe': 'Fwd P/E',
+            'price': 'Price ($)',
+            'market_cap': 'Market Cap',
+            'revenue': 'Revenue',
+            'net_income': 'Net Income',
+            'dividend_yield': 'Div Yield (%)',
+            'dividend_rate': 'Div Rate ($)',
+            'profit_margin': 'Profit Margin',
+            'roa': 'ROA',
+            'roe': 'ROE'
+        };
+
+        metrics.forEach((m, mIdx) => {
+            let rowLabel = LABELS[m] || m;
+            let tr = `<tr><td class="text-bold" style="background: #e6eaf0;">${rowLabel} <button onclick="removeModelBuilderMetric(${mIdx})" style="background: none; border: none; color: #cc0000; font-weight: bold; cursor: pointer; padding: 0 4px; font-size: 10px; float: right;">X</button></td>`;
+            
+            mbState.tickers.forEach(ticker => {
+                let cellData = liveData[ticker];
+                let val = 'N/A';
+                if (cellData && !cellData.error) {
+                    val = cellData[m];
+                    if (val === undefined || val === null) val = 'N/A';
+                } else if (cellData && cellData.error) {
+                    val = 'ERR';
+                }
+                tr += `<td class="text-right" style="font-family: 'Courier New', monospace;">${val}</td>`;
+            });
+            tr += '</tr>';
+            tbody += tr;
+        });
+        tbody += '</tbody>';
+
+        table.innerHTML = thead + tbody;
+    }
+
+    function addModelBuilderTicker() {
+        let val = document.getElementById('mb-ticker-input').value.toUpperCase().trim();
+        if (!val) return;
+        document.getElementById('mb-ticker-input').value = '';
+        
+        let mb = getMBState();
+        if (!mb.tickers) mb.tickers = [];
+        if (!mb.tickers.includes(val)) {
+            mb.tickers.push(val);
+            setMBState(mb);
+            renderModelBuilder();
+        }
+    }
+
+    function addModelBuilderMetric() {
+        let val = document.getElementById('mb-metric-input').value;
+        if (!val) return;
+        
+        let mb = getMBState();
+        if (!mb.metrics) mb.metrics = [];
+        if (!mb.metrics.includes(val)) {
+            mb.metrics.push(val);
+            setMBState(mb);
+            renderModelBuilder();
+        }
+    }
+
+    function removeModelBuilderTicker(idx) {
+        let mb = getMBState();
+        mb.tickers.splice(idx, 1);
+        setMBState(mb);
+        renderModelBuilder();
+    }
+
+    function removeModelBuilderMetric(idx) {
+        let mb = getMBState();
+        mb.metrics.splice(idx, 1);
+        setMBState(mb);
+        renderModelBuilder();
+    }
+
+    function downloadModelBuilderCSV() {
+        let table = document.getElementById('model-table');
+        let csv = [];
+        for (let i = 0; i < table.rows.length; i++) {
+            let row = [], cols = table.rows[i].querySelectorAll("td, th");
+            for (let j = 0; j < cols.length; j++) {
+                // Strip the "X" button text
+                let text = cols[j].innerText.replace(/X$/, '').trim();
+                row.push('"' + text + '"');
+            }
+            csv.push(row.join(","));
+        }
+        let csvFile = new Blob([csv.join("\n")], {type: "text/csv"});
+        let downloadLink = document.createElement("a");
+        downloadLink.download = "model_builder_export.csv";
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderModelBuilder();
+    });
+</script>
+
+<style>
+    .model-builder-input {
+        padding: 6px;
+        font-family: Tahoma, Arial, sans-serif;
+        border: 1px solid #003366;
+        font-size: 12px;
+        margin-right: 5px;
+    }
+    .model-builder-btn {
+        background: #003366;
+        color: white;
+        border: 1px solid #000;
+        padding: 6px 12px;
+        font-weight: bold;
+        font-size: 12px;
+        cursor: pointer;
+    }
+    .model-builder-btn:hover {
+        background: #005599;
+    }
+</style>
+{% endblock %}

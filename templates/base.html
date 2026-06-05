@@ -29,11 +29,12 @@
             
             <nav class="web-nav">
                 {% if request.path != '/' and request.path != '/index' %}
-                    <a href="{{ url_for('index') }}" class="web-nav-link">Market Home</a>
+                    <a href="{{ url_for('index') }}" class="web-nav-link">Home</a>
                 {% else %}
-                    <span class="web-nav-link active">Market Home</span>
+                    <span class="web-nav-link active">Home</span>
                 {% endif %}
-                <a href="{{ url_for('index_constituents', index_id='sp500') }}" class="web-nav-link {% if request.path.startswith('/index-constituents/') %}active{% endif %}">Index Constituents</a>
+                <a href="{{ url_for('index_constituents', index_id='sp500') }}" class="web-nav-link {% if request.path.startswith('/index-constituents/') %}active{% endif %}">Indices</a>
+                <a href="{{ url_for('model_builder_view') }}" class="web-nav-link {% if request.path == '/model-builder' %}active{% endif %}">Model Builder</a>
             </nav>
 
             <div class="web-search-box">
