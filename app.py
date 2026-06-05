@@ -1496,9 +1496,11 @@ def terminal_command():
     
     try:
         cmd_lower = cmd.lower()
-        if cmd_lower.startswith('balance sheet'):
-            parts = cmd.split()
-            ticker = parts[-1].upper()
+        if 'balance sheet' in cmd_lower:
+            # Extract ticker by removing "balance" and "sheet"
+            ticker_parts = [p for p in parts if p.lower() not in ['balance', 'sheet']]
+            ticker = ticker_parts[0].upper() if ticker_parts else ''
+            
             # GCP FIX: Injected global desktop session context
             stock = yf.Ticker(ticker)
             processed = process_balance_sheet(stock.balance_sheet)
@@ -1511,9 +1513,10 @@ def terminal_command():
                 return jsonify({'action': 'statement', 'title': f"{ticker} Balance Sheet", 'headers': headers, 'rows': rows})
             return jsonify({'error': f'No balance sheet data for {ticker}'})
             
-        elif cmd_lower.startswith('income statement'):
-            parts = cmd.split()
-            ticker = parts[-1].upper()
+        elif 'income statement' in cmd_lower:
+            ticker_parts = [p for p in parts if p.lower() not in ['income', 'statement']]
+            ticker = ticker_parts[0].upper() if ticker_parts else ''
+            
             # GCP FIX: Injected global desktop session context
             stock = yf.Ticker(ticker)
             processed = process_income_statement(stock.financials)
@@ -1525,9 +1528,9 @@ def terminal_command():
                 return jsonify({'action': 'statement', 'title': f"{ticker} Income Statement", 'headers': headers, 'rows': rows})
             return jsonify({'error': f'No income statement data for {ticker}'})
             
-        elif cmd_lower.startswith('cash flow'):
-            parts = cmd.split()
-            ticker = parts[-1].upper()
+        elif 'cash flow' in cmd_lower:
+            ticker_parts = [p for p in parts if p.lower() not in ['cash', 'flow']]
+            ticker = ticker_parts[0].upper() if ticker_parts else ''
             # GCP FIX: Injected global desktop session context
             stock = yf.Ticker(ticker)
             processed = process_cash_flow(stock.cashflow)
