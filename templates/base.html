@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Schwerpunkt{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=2">
     <script src="{{ url_for('static', filename='chart.js') }}"></script>
     <script>
@@ -33,9 +34,10 @@
                 {% else %}
                     <span class="web-nav-link active">Home</span>
                 {% endif %}
+                <a href="{{ url_for('stock_search_view') }}" class="web-nav-link {% if request.path.startswith('/ticker/') or request.path == '/stock' %}active{% endif %}">Stocks</a>
                 <a href="{{ url_for('index_constituents', index_id='sp500') }}" class="web-nav-link {% if request.path.startswith('/index-constituents/') %}active{% endif %}">Indices</a>
                 <a href="{{ url_for('model_builder_view') }}" class="web-nav-link {% if request.path == '/model-builder' %}active{% endif %}">Model Builder</a>
-                <a href="{{ url_for('guide_view') }}" class="web-nav-link {% if request.path == '/guide' %}active{% endif %}">Guide</a>
+                <a href="{{ url_for('guide_view') }}" class="web-nav-link {% if request.path == '/guide' %}active{% endif %}" {% if request.path != '/guide' %}style="color: #1f4d1f;"{% endif %}>Guide</a>
             </nav>
 
             <div class="web-search-box">

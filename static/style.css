@@ -34,7 +34,7 @@ a:hover {
     width: 1300px;
     margin: 0 auto;
     background-color: #ffffff;
-    border: 1px solid #d3d9e8;
+    border: 1px solid #d6ebd6;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
 }
 
@@ -115,8 +115,8 @@ a:hover {
 
 .web-nav-link.active {
     color: #ffffff;
-    background-color: #3b5998;
-    background-image: linear-gradient(to bottom, #4c66a4, #29487d);
+    background-color: #1f4d1f;
+    background-image: linear-gradient(to bottom, #2d6b2d, #143314);
     border: 2px inset #ffffff;
     border-right-color: #888888;
     border-bottom-color: #888888;
@@ -140,7 +140,7 @@ a:hover {
 }
 
 .web-search-input:focus {
-    outline: 2px solid #3b5998;
+    outline: 2px solid #1f4d1f;
 }
 
 .web-search-btn {
@@ -272,17 +272,17 @@ a:hover {
    --------------------------------------------------------- */
 .box {
     background-color: #ffffff;
-    border: 1px solid #d3d9e8;
+    border: 1px solid #d6ebd6;
     margin-bottom: 15px;
 }
 
 .box-header {
     background-color: #eceff5; /* Classic Light Gray-Blue */
-    color: #3b5998; /* Facebook Blue */
+    color: #1f4d1f; /* Facebook Blue */
     font-weight: bold;
     font-size: 11px;
     padding: 6px 10px;
-    border-bottom: 1px solid #d3d9e8;
+    border-bottom: 1px solid #d6ebd6;
     letter-spacing: 0.2px;
 }
 
@@ -294,10 +294,10 @@ a:hover {
 .section-title {
     font-size: 12px;
     font-weight: bold;
-    color: #3b5998;
+    color: #1f4d1f;
     margin-top: 15px;
     margin-bottom: 8px;
-    border-bottom: 1px solid #d3d9e8;
+    border-bottom: 1px solid #d6ebd6;
     padding-bottom: 3px;
 }
 
@@ -308,7 +308,7 @@ a:hover {
     margin-bottom: 12px;
     padding: 10px;
     background-color: #f6f7f9;
-    border: 1px solid #d3d9e8;
+    border: 1px solid #d6ebd6;
 }
 
 /* Layout split structures */
@@ -339,12 +339,12 @@ a:hover {
     border-collapse: collapse;
     font-size: 11px;
     font-family: Tahoma, Arial, sans-serif;
-    border: 1px solid #d3d9e8;
+    border: 1px solid #d6ebd6;
 }
 
 .data-table th {
     background-color: #f6f7f9;
-    border: 1px solid #d3d9e8;
+    border: 1px solid #d6ebd6;
     color: #333333;
     font-weight: bold;
     padding: 6px 8px;
@@ -395,7 +395,7 @@ a:hover {
    TACTILE INTERACTIVE BUTTONS
    --------------------------------------------------------- */
 .btn {
-    background-color: #3b5998;
+    background-color: #1f4d1f;
     color: #ffffff;
     border: 1px solid #29487d;
     font-size: 11px;
@@ -479,7 +479,7 @@ a:hover {
     padding: 2px 6px;
     text-decoration: none;
     display: inline-block;
-    color: #3b5998;
+    color: #1f4d1f;
     outline: none;
     border-radius: 2px;
 }
@@ -502,7 +502,7 @@ a:hover {
 .subview-tabs {
     display: flex;
     background-color: #eceff5;
-    border: 1px solid #d3d9e8;
+    border: 1px solid #d6ebd6;
     border-bottom: none;
     padding: 6px 10px 0 10px;
     gap: 4px;
@@ -510,13 +510,13 @@ a:hover {
 
 .subview-tab-item {
     background-color: #f6f7f9;
-    border: 1px solid #d3d9e8;
+    border: 1px solid #d6ebd6;
     border-bottom: none;
     border-radius: 3px 3px 0 0;
     padding: 6px 16px;
     font-size: 11px;
     font-weight: bold;
-    color: #3b5998;
+    color: #1f4d1f;
     cursor: pointer;
     text-decoration: none;
     display: inline-block;
@@ -544,7 +544,7 @@ a:hover {
 .tab-bar {
     display: flex;
     background-color: #f6f7f9;
-    border-bottom: 1px solid #d3d9e8;
+    border-bottom: 1px solid #d6ebd6;
     padding: 6px 8px 0 8px;
     gap: 4px;
     user-select: none;
@@ -552,13 +552,13 @@ a:hover {
 
 .tab-item {
     background-color: #f6f7f9;
-    border: 1px solid #d3d9e8;
+    border: 1px solid #d6ebd6;
     border-bottom: none;
     border-radius: 2px 2px 0 0;
     padding: 4px 10px;
     font-size: 11px;
     font-weight: bold;
-    color: #3b5998;
+    color: #1f4d1f;
     cursor: pointer;
     text-decoration: none;
     display: inline-block;
@@ -592,7 +592,7 @@ a:hover {
     align-items: center;
     gap: 6px;
     background-color: #f6f7f9;
-    border: 1px solid #d3d9e8;
+    border: 1px solid #d6ebd6;
     padding: 5px 8px;
     user-select: none;
 }
@@ -607,7 +607,7 @@ a:hover {
 .section-filter-item {
     background-color: #ffffff;
     border: 1px solid #bdc3c7;
-    color: #3b5998;
+    color: #1f4d1f;
     padding: 2px 8px;
     cursor: pointer;
     font-size: 10px;
@@ -619,7 +619,7 @@ a:hover {
 }
 
 .section-filter-item.active {
-    background-color: #3b5998;
+    background-color: #1f4d1f;
     color: #ffffff;
     border-color: #29487d;
     font-weight: bold;
@@ -642,7 +642,7 @@ a:hover {
 
 .metric-card {
     background-color: #ffffff;
-    border: 1px solid #d3d9e8;
+    border: 1px solid #d6ebd6;
     padding: 10px;
     text-align: left;
 }
@@ -660,7 +660,7 @@ a:hover {
 .metric-value {
     font-size: 15px;
     font-weight: bold;
-    color: #3b5998;
+    color: #1f4d1f;
     font-family: "Courier New", Courier, monospace;
 }
 
@@ -671,7 +671,7 @@ a:hover {
     width: 100%;
     overflow-x: auto;
     margin-bottom: 15px;
-    border: 1px solid #d3d9e8;
+    border: 1px solid #d6ebd6;
     background-color: #ffffff;
 }
 
@@ -681,7 +681,7 @@ a:hover {
     align-items: center;
     gap: 8px;
     background-color: #f6f7f9;
-    border: 1px solid #d3d9e8;
+    border: 1px solid #d6ebd6;
     padding: 6px 10px;
 }
 
@@ -702,7 +702,7 @@ a:hover {
 }
 
 .line-filter-input:focus {
-    outline: 2px solid #3b5998;
+    outline: 2px solid #1f4d1f;
 }
 
 /* Statement rows custom underlines & colors */
@@ -753,7 +753,7 @@ a:hover {
 
 .dcf-form-panel {
     background-color: #ffffff;
-    border: 1px solid #d3d9e8;
+    border: 1px solid #d6ebd6;
     padding: 12px;
 }
 
@@ -785,14 +785,14 @@ a:hover {
 .dcf-fair-value-box {
     margin-top: 15px;
     background-color: #eceff5;
-    border: 1px solid #3b5998;
+    border: 1px solid #1f4d1f;
     padding: 12px;
     text-align: center;
 }
 
 .dcf-fair-value-title {
     font-weight: bold;
-    color: #3b5998;
+    color: #1f4d1f;
     font-size: 11px;
     text-transform: uppercase;
     margin-bottom: 4px;
@@ -809,7 +809,7 @@ a:hover {
    CHARTS & EMBEDDED WIDGETS
    --------------------------------------------------------- */
 .chart-container {
-    border: 1px solid #d3d9e8;
+    border: 1px solid #d6ebd6;
     padding: 12px;
     background-color: #ffffff;
     text-align: center;
@@ -828,7 +828,7 @@ a:hover {
    --------------------------------------------------------- */
 .web-footer {
     background-color: #f6f7f9;
-    border-top: 1px solid #d3d9e8;
+    border-top: 1px solid #d6ebd6;
     padding: 10px 16px;
     font-size: 11px;
     color: #666666;

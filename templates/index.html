@@ -47,7 +47,7 @@
         <div class="layout-split">
             <!-- S&P 500 Chart (VOO) -->
             <div class="chart-container" style="flex: 1; margin-bottom: 0;">
-                <div class="section-title" style="margin-top: 0; font-size: 11px; text-align: center; font-weight: bold; border-bottom: 1px solid #d3d9e8; padding-bottom: 3px;">S&P 500 Index (VOO Proxy)</div>
+                <div class="section-title" style="margin-top: 0; font-size: 11px; text-align: center; font-weight: bold; border-bottom: 1px solid #d6ebd6; padding-bottom: 3px;">S&P 500 Index (VOO Proxy)</div>
                 {% if charts.sp500_data %}
                     <canvas id="sp500-chart" style="width: 100%; height: 200px; display: block;"></canvas>
                 {% else %}
@@ -57,7 +57,7 @@
             
             <!-- Sector Performance Heatmap -->
             <div class="chart-container" style="flex: 1; margin-bottom: 0;">
-                <div class="section-title" style="margin-top: 0; font-size: 11px; text-align: center; font-weight: bold; border-bottom: 1px solid #d3d9e8; padding-bottom: 3px;">Sector Performance (1D)</div>
+                <div class="section-title" style="margin-top: 0; font-size: 11px; text-align: center; font-weight: bold; border-bottom: 1px solid #d6ebd6; padding-bottom: 3px;">Sector Performance (1D)</div>
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 5px; height: 190px;">
                     {% if sector_performance %}
                         {% for s in sector_performance %}
@@ -91,7 +91,7 @@
         <div class="layout-three-cols" style="gap: 0; margin-top: 0; border: none;">
             
             <!-- Daily Gainers -->
-            <div style="border-right: 1px solid #d3d9e8;">
+            <div style="border-right: 1px solid #d6ebd6;">
                 <div class="box-header" style="background-color: #0d5c3a; color: #fff;">Best Performing</div>
                 <table class="data-table" style="border: none;">
                     <thead>
@@ -120,7 +120,7 @@
             </div>
 
             <!-- Daily Losers -->
-            <div style="border-right: 1px solid #d3d9e8;">
+            <div style="border-right: 1px solid #d6ebd6;">
                 <div class="box-header" style="background-color: #7d1c1c; color: #fff;">Worst Performing</div>
                 <table class="data-table" style="border: none;">
                     <thead>
@@ -254,7 +254,7 @@
 
 <style>
     .sheet-cell {
-        border: 1px solid #d3d9e8;
+        border: 1px solid #d6ebd6;
         padding: 8px;
         min-width: 80px;
         font-family: 'Courier New', monospace;
@@ -271,7 +271,7 @@
         font-weight: bold;
         text-align: center;
         color: #555;
-        border: 1px solid #d3d9e8;
+        border: 1px solid #d6ebd6;
         padding: 5px;
     }
 </style>
@@ -316,7 +316,7 @@
 
             let priceStr = '';
             if (note.price_at_creation) {
-                priceStr = `<div style="margin-top: 8px; font-size: 11px; color: #003366; font-family: 'Courier New', monospace; background-color: #e6eaf0; padding: 4px; border: 1px solid #d3d9e8; display: inline-block;">REF PRICE: $${parseFloat(note.price_at_creation).toFixed(2)}</div>`;
+                priceStr = `<div style="margin-top: 8px; font-size: 11px; color: #003366; font-family: 'Courier New', monospace; background-color: #e6eaf0; padding: 4px; border: 1px solid #d6ebd6; display: inline-block;">REF PRICE: $${parseFloat(note.price_at_creation).toFixed(2)}</div>`;
             }
 
             let parsedContent = note.content.replace(/\$([A-Za-z]+)/g, '<a href="/ticker/$1" style="color: #003366; font-weight: bold; text-decoration: underline;">$$$1</a>');

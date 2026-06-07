@@ -13,12 +13,12 @@
             <div class="box-body" style="padding: 10px;">
                 
                 <!-- Index Switcher -->
-                <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid #d3d9e8;">
+                <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid #d6ebd6;">
                     <span style="font-weight: bold; color: #555; font-size: 11px;">SELECT INDEX:</span>
-                    <a href="{{ url_for('index_constituents', index_id='sp500') }}" class="btn {% if index_id == 'sp500' %}btn-secondary active{% else %}btn-secondary{% endif %} index-btn" {% if index_id == 'sp500' %}style="background-color: #3b5998; color: #fff;"{% endif %}>S&P 500</a>
-                    <a href="{{ url_for('index_constituents', index_id='nasdaq100') }}" class="btn {% if index_id == 'nasdaq100' %}btn-secondary active{% else %}btn-secondary{% endif %} index-btn" {% if index_id == 'nasdaq100' %}style="background-color: #3b5998; color: #fff;"{% endif %}>Nasdaq 100</a>
-                    <a href="{{ url_for('index_constituents', index_id='dow30') }}" class="btn {% if index_id == 'dow30' %}btn-secondary active{% else %}btn-secondary{% endif %} index-btn" {% if index_id == 'dow30' %}style="background-color: #3b5998; color: #fff;"{% endif %}>Dow Jones 30</a>
-                    <a href="{{ url_for('index_constituents', index_id='russell3000') }}" class="btn {% if index_id == 'russell3000' %}btn-secondary active{% else %}btn-secondary{% endif %} index-btn" {% if index_id == 'russell3000' %}style="background-color: #3b5998; color: #fff;"{% endif %}>Russell 3000</a>
+                    <a href="{{ url_for('index_constituents', index_id='sp500') }}" class="btn {% if index_id == 'sp500' %}btn-secondary active{% else %}btn-secondary{% endif %} index-btn" {% if index_id == 'sp500' %}style="background-color: #1f4d1f; color: #fff;"{% endif %}>S&P 500</a>
+                    <a href="{{ url_for('index_constituents', index_id='nasdaq100') }}" class="btn {% if index_id == 'nasdaq100' %}btn-secondary active{% else %}btn-secondary{% endif %} index-btn" {% if index_id == 'nasdaq100' %}style="background-color: #1f4d1f; color: #fff;"{% endif %}>Nasdaq 100</a>
+                    <a href="{{ url_for('index_constituents', index_id='dow30') }}" class="btn {% if index_id == 'dow30' %}btn-secondary active{% else %}btn-secondary{% endif %} index-btn" {% if index_id == 'dow30' %}style="background-color: #1f4d1f; color: #fff;"{% endif %}>Dow Jones 30</a>
+                    <a href="{{ url_for('index_constituents', index_id='russell3000') }}" class="btn {% if index_id == 'russell3000' %}btn-secondary active{% else %}btn-secondary{% endif %} index-btn" {% if index_id == 'russell3000' %}style="background-color: #1f4d1f; color: #fff;"{% endif %}>Russell 3000</a>
                 </div>
 
                 <!-- Filter bar -->
@@ -65,7 +65,7 @@
                 <canvas id="sector-pie-chart" style="width: 100%; height: 160px; display: block; margin: 0 auto;"></canvas>
                 
                 <!-- Sector Legend Table -->
-                <div style="margin-top: 12px; text-align: left; font-size: 10px; border-top: 1px solid #d3d9e8; padding-top: 8px;">
+                <div style="margin-top: 12px; text-align: left; font-size: 10px; border-top: 1px solid #d6ebd6; padding-top: 8px;">
                     <table style="width: 100%; border-collapse: collapse; line-height: 1.5;">
                         <tbody id="sector-legend-tbody">
                             {% for sec in sector_concentration[:6] %}
@@ -101,7 +101,7 @@
                 <canvas id="holdings-pie-chart" style="width: 100%; height: 160px; display: block; margin: 0 auto;"></canvas>
                 
                 <!-- Holdings Legend Table -->
-                <div style="margin-top: 12px; text-align: left; font-size: 10px; border-top: 1px solid #d3d9e8; padding-top: 8px;">
+                <div style="margin-top: 12px; text-align: left; font-size: 10px; border-top: 1px solid #d6ebd6; padding-top: 8px;">
                     <table style="width: 100%; border-collapse: collapse; line-height: 1.5;">
                         <tbody id="holdings-legend-tbody">
                             {% for hold in top_holdings[:8] %}
@@ -170,7 +170,7 @@ const growthData = {{ growth_data|tojson }};
 
 // Custom color palette matching Schwerpunkt retro Web 2.0 aesthetics - vibrant distinct colors
 const themeColors = [
-    '#3b5998', // Classic FB Blue
+    '#1f4d1f', // Classic FB Blue
     '#2ecc71', // Green
     '#e74c3c', // Red
     '#ff9800', // Orange
@@ -483,7 +483,7 @@ function drawGrowthChart(canvasId, rawData) {
             if (idx === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
         });
-        ctx.strokeStyle = '#3b5998';
+        ctx.strokeStyle = '#1f4d1f';
         ctx.lineWidth = 1.8;
         ctx.stroke();
         
@@ -496,7 +496,7 @@ function drawGrowthChart(canvasId, rawData) {
             ctx.arc(x, y, 2.5, 0, 2 * Math.PI);
             ctx.fillStyle = idx === hoverIndex ? '#ff0000' : '#ffffff';
             ctx.fill();
-            ctx.strokeStyle = idx === hoverIndex ? '#ff0000' : '#3b5998';
+            ctx.strokeStyle = idx === hoverIndex ? '#ff0000' : '#1f4d1f';
             ctx.lineWidth = 1.2;
             ctx.stroke();
         });

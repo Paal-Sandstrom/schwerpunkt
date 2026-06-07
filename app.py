@@ -1478,6 +1478,10 @@ def model_builder_view():
 def guide_view():
     return render_template('guide.html')
 
+@app.route('/stock')
+def stock_search_view():
+    return render_template('stock_search.html')
+
 @app.route('/query', methods=['GET', 'POST'])
 def query_ticker():
     """Redirect user search input to target stock ticker route."""
@@ -1668,6 +1672,16 @@ def terminal_command():
                 # Default assume first is ticker
                 ticker = parts[0].upper()
                 metric_query = " ".join(parts[1:]).lower()
+                
+            # Handle common acronyms
+            aliases = {
+                'ocf': 'operating cash flow',
+                'fcf': 'free cash flow',
+                'capex': 'capital expenditure',
+                'ebitda': 'normalized ebitda'
+            }
+            if metric_query in aliases:
+                metric_query = aliases[metric_query]
                 
             stock = yf.Ticker(ticker)
             all_indexes = {}

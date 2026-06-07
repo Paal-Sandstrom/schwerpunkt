@@ -36,7 +36,7 @@
     </div>
     <div class="metric-card">
         <div class="metric-label">CURRENT PRICE</div>
-        <div class="metric-value" style="color: #3b5998;">{{ metrics.current_price }}</div>
+        <div class="metric-value" style="color: #1f4d1f;">{{ metrics.current_price }}</div>
     </div>
     <div class="metric-card">
         <div class="metric-label">P/E RATIO</div>
@@ -647,12 +647,12 @@
                                 datasets: [{
                                     label: metricName,
                                     data: values,
-                                    backgroundColor: isPct ? 'rgba(59, 89, 152, 0.1)' : '#3b5998',
-                                    borderColor: '#3b5998',
+                                    backgroundColor: isPct ? 'rgba(31, 77, 31, 0.1)' : '#1f4d1f',
+                                    borderColor: '#1f4d1f',
                                     borderWidth: 2,
                                     fill: isPct,
                                     tension: 0.1,
-                                    pointBackgroundColor: '#3b5998',
+                                    pointBackgroundColor: '#1f4d1f',
                                     pointRadius: isPct ? 4 : 0
                                 }]
                             },
@@ -701,7 +701,7 @@
                     
                     <!-- Left: Parameters Inputs Form -->
                     <div class="dcf-form-panel">
-                        <div class="section-title" style="margin-top: 0; font-size: 12px; color: #3b5998;">MODEL INPUTS</div>
+                        <div class="section-title" style="margin-top: 0; font-size: 12px; color: #1f4d1f;">MODEL INPUTS</div>
                         <form action="{{ url_for('ticker_detail', symbol=symbol) }}" method="GET">
                             <!-- Retain DCF view when recalculating -->
                             <input type="hidden" name="view" value="dcf">
