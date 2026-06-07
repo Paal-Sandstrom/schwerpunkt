@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
-    <!-- Dark green background -->
-    <rect width="100" height="100" fill="#1f4d1f" rx="15" ry="15"/>
+    <!-- White background -->
+    <rect width="100" height="100" fill="#ffffff" rx="15" ry="15"/>
     
     <!-- Bright retro-terminal green styling -->
     <style>
-        .stroke-neon { stroke: #4dff4d; fill: none; stroke-width: 5; stroke-linejoin: round; stroke-linecap: round; }
-        .stroke-dashed-neon { stroke: #4dff4d; fill: none; stroke-width: 3; stroke-dasharray: 6,6; }
-        .fill-neon { fill: #4dff4d; }
+        .stroke-neon { stroke: #1f4d1f; fill: none; stroke-width: 5; stroke-linejoin: round; stroke-linecap: round; }
+        .stroke-dashed-neon { stroke: #1f4d1f; fill: none; stroke-width: 3; stroke-dasharray: 6,6; }
+        .fill-neon { fill: #1f4d1f; }
     </style>
 
     <!-- Triangle A(0,95) B(50,5) C(100,95) -->

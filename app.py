@@ -100,7 +100,9 @@ CONSTITUENTS_LISTS = {
 INDEX_WATCHLIST_NAMES = {
     'sp500': 'S&P 500',
     'nasdaq100': 'Nasdaq 100',
-    'dow30': 'Dow Jones 30'
+    'dow30': 'Dow Jones 30',
+    'nikkei225': 'Nikkei 225',
+    'omxs30': 'OMX Stockholm 30'
 }
 
 # ---------------------------------------------------------
@@ -131,7 +133,36 @@ app_cache = AppCache()
 # DATA FETCHING HELPERS
 # ---------------------------------------------------------
 
-def format_value(val, fmt_type):
+_fx_cache = {}
+_fx_cache_date = None
+
+def get_usd_conversion_rate(currency):
+    global _fx_cache, _fx_cache_date
+    import datetime
+    today = datetime.date.today().isoformat()
+    if _fx_cache_date != today:
+        _fx_cache = {}
+        _fx_cache_date = today
+    
+    if not currency:
+        return 1.0
+        
+    currency = currency.upper()
+    if currency == 'USD':
+        return 1.0
+    if currency in _fx_cache:
+        return _fx_cache[currency]
+        
+    try:
+        ticker = yf.Ticker(f"{currency}USD=X")
+        rate = ticker.history(period="1d")['Close'].iloc[-1]
+        _fx_cache[currency] = float(rate)
+        return float(rate)
+    except Exception as e:
+        print(f"Error fetching FX for {currency}: {e}")
+        return 1.0
+
+def format_value(val, fmt_type, conversion_rate=1.0):
     """Safely format numeric and database outputs for early 2000s stock UI."""
     if val is None or pd.isna(val):
         return "N/A"
@@ -139,6 +170,7 @@ def format_value(val, fmt_type):
         if fmt_type == "pct":
             return f"{val * 100:.2f}%"
         elif fmt_type == "currency":
+            val = val * conversion_rate
             if val >= 1e12:
                 return f"${val / 1e12:.2f}T"
             elif val >= 1e9:
@@ -199,7 +231,7 @@ def clean_label(label_str):
             title_words.append(w.capitalize())
     return " ".join(title_words)
 
-def format_series_values(series, label_name=""):
+def format_series_values(series, label_name="", fx_rate=1.0):
     """Format row cell series based on its financial item type (currency, shares, rates, ratios)."""
     values = []
     lbl_lower = label_name.lower()
@@ -228,10 +260,12 @@ def format_series_values(series, label_name=""):
                 else:
                     values.append(f"{v:,.0f}")
             elif is_eps:
+                v = v * fx_rate
                 values.append(f"${v:,.2f}")
             elif is_ratio:
                 values.append(f"{v:.2f}x")
             else:
+                v = v * fx_rate
                 if abs(v) >= 1e9:
                     values.append(f"${v/1e9:,.2f}B")
                 elif abs(v) >= 1e6:
@@ -246,7 +280,7 @@ def format_series_values(series, label_name=""):
 # STATEMENT RESTRUCTURING HELPERS
 # ---------------------------------------------------------
 
-def process_income_statement(df):
+def process_income_statement(df, fx_rate=1.0):
     """Format Income Statement, selecting 3-year historical views and tag totals."""
     if df is None or df.empty:
         return None
@@ -276,7 +310,7 @@ def process_income_statement(df):
             
             row_data = {
                 'label': formatted_label,
-                'values': format_series_values(series, label_str),
+                'values': format_series_values(series, label_str, fx_rate),
                 'is_summary': is_summary,
                 'is_major_total': is_major_total
             }
@@ -343,7 +377,7 @@ def process_income_statement(df):
         print(f"Error processing income statement: {e}")
         return None
 
-def process_balance_sheet(df):
+def process_balance_sheet(df, fx_rate=1.0):
     """Group Balance Sheet rows into Assets, Liabilities, and Equity sections."""
     if df is None or df.empty:
         return None
@@ -382,7 +416,7 @@ def process_balance_sheet(df):
             
             row_data = {
                 'label': formatted_label,
-                'values': format_series_values(series, label_str),
+                'values': format_series_values(series, label_str, fx_rate),
                 'is_summary': is_summary,
                 'is_major_total': is_major_total
             }
@@ -494,7 +528,7 @@ def process_balance_sheet(df):
         print(f"Error processing balance sheet: {e}")
         return None
 
-def process_cash_flow(df):
+def process_cash_flow(df, fx_rate=1.0):
     """Categorize Cash Flow Statement into Operating, Investing, and Financing Activities."""
     if df is None or df.empty:
         return None
@@ -526,7 +560,7 @@ def process_cash_flow(df):
             
             row_data = {
                 'label': formatted_label,
-                'values': format_series_values(series, label_str),
+                'values': format_series_values(series, label_str, fx_rate),
                 'is_summary': is_summary,
                 'is_major_total': is_major_total
             }
@@ -951,6 +985,8 @@ def fetch_stock_basic_info(symbol):
         # GCP FIX: Injected masked custom desktop session
         ticker = yf.Ticker(symbol)
         info = ticker.info
+        currency = info.get('financialCurrency', info.get('currency', 'USD'))
+        fx_rate = get_usd_conversion_rate(currency)
         name = info.get('longName') or info.get('shortName') or COMPANY_NAMES.get(symbol) or symbol
         market_cap = info.get('marketCap')
         pe_ratio = info.get('trailingPE')
@@ -1045,7 +1081,50 @@ def run_dcf_valuation(fcf_base, growth_rate, discount_rate, terminal_growth_rate
 # FLASK ROUTES
 # ---------------------------------------------------------
 
+
+# ---------------------------------------------------------
+# SEARCH INDEX CACHE
+# ---------------------------------------------------------
+SEARCH_INDEX = []
+
+def build_search_index():
+    global SEARCH_INDEX
+    SEARCH_INDEX = []
+    import os, json
+    index_path = os.path.join('static', 'index_data.json')
+    if os.path.exists(index_path):
+        with open(index_path, 'r') as f:
+            data = json.load(f)
+            seen = set()
+            for idx_key, idx_data in data.items():
+                for stock in idx_data.get('constituents', []):
+                    symbol = stock.get('symbol')
+                    if symbol and symbol not in seen:
+                        seen.add(symbol)
+                        SEARCH_INDEX.append({
+                            'symbol': symbol,
+                            'name': stock.get('name', symbol)
+                        })
+
+# Build it on startup
+build_search_index()
+
+@app.route('/api/search')
+def api_search():
+    query = request.args.get('q', '').lower().strip()
+    if not query:
+        return jsonify([])
+    
+    results = []
+    for item in SEARCH_INDEX:
+        if query in item['symbol'].lower() or query in item['name'].lower():
+            results.append(item)
+            if len(results) >= 10:
+                break
+    return jsonify(results)
+
 @app.route('/')
+
 def index():
     """Index view displaying indices quote grid, movers, side-by-side index charts, and user projects."""
     start_time = time.time()
@@ -1114,6 +1193,8 @@ def ticker_detail(symbol):
             # GCP FIX: Injected masked custom desktop session
             ticker = yf.Ticker(symbol)
             info = ticker.info
+            currency = info.get('financialCurrency', info.get('currency', 'USD'))
+            fx_rate = get_usd_conversion_rate(currency)
             
             if not info or 'symbol' not in info and 'longName' not in info:
                 hist = ticker.history(period="1d")
@@ -1148,7 +1229,7 @@ def ticker_detail(symbol):
             pe_ratio = format_value(info.get('trailingPE'), 'ratio')
                 
             metrics = {
-                'market_cap': format_value(market_cap, 'currency'),
+                'market_cap': format_value(market_cap, 'currency', fx_rate),
                 'fcf_yield': fcf_yield,
                 'current_price': snapshot['price_formatted'],
                 'pe_ratio': pe_ratio
@@ -1163,7 +1244,7 @@ def ticker_detail(symbol):
                 'Operating Profit Margin (EBIT / Revenue)': format_value(info.get('operatingMargins'), 'pct'),
                 'Return on Equity (ROE)': format_value(info.get('returnOnEquity'), 'pct'),
                 'Return on Assets (ROA)': format_value(info.get('returnOnAssets'), 'pct'),
-                'Dividend Rate': format_value(info.get('dividendRate'), 'currency'),
+                'Dividend Rate': format_value(info.get('dividendRate'), 'currency', fx_rate),
                 'Dividend Yield': format_value(info.get('dividendYield') / 100 if info.get('dividendYield') else None, 'pct'),
                 'Ex-Dividend Date': format_ex_dividend_date(info.get('exDividendDate')),
                 'Next Earnings Date': format_ex_dividend_date(info.get('earningsTimestamp') or info.get('earningsTimestampStart')),
@@ -1180,9 +1261,9 @@ def ticker_detail(symbol):
                 inc_df, bal_df, cf_df = pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
                 
             statements = {
-                'income_stmt': process_income_statement(inc_df),
-                'balance_sheet': process_balance_sheet(bal_df),
-                'cashflow': process_cash_flow(cf_df)
+                'income_stmt': process_income_statement(inc_df, fx_rate),
+                'balance_sheet': process_balance_sheet(bal_df, fx_rate),
+                'cashflow': process_cash_flow(cf_df, fx_rate)
             }
             
             fcf_base = info.get('freeCashflow')
@@ -1299,23 +1380,23 @@ def ticker_detail(symbol):
                     for p in dcf_calc['projections']:
                         formatted_projs.append({
                             'year': p['year'],
-                            'fcf': format_value(p['fcf'], 'currency'),
-                            'pv': format_value(p['pv'], 'currency')
+                            'fcf': format_value(p['fcf'], 'currency', fx_rate),
+                            'pv': format_value(p['pv'], 'currency', fx_rate)
                         })
                     
                     dcf_results = {
                         'projections': formatted_projs,
-                        'fcf_base_formatted': format_value(raw['fcf_base'], 'currency'),
-                        'sum_pv_fcf': format_value(dcf_calc['sum_pv_fcf'], 'currency'),
-                        'terminal_value': format_value(dcf_calc['terminal_value'], 'currency'),
-                        'pv_terminal_value': format_value(dcf_calc['pv_terminal_value'], 'currency'),
-                        'enterprise_value': format_value(dcf_calc['enterprise_value'], 'currency'),
-                        'cash': format_value(raw['total_cash'], 'currency'),
-                        'debt': format_value(raw['total_debt'], 'currency'),
-                        'net_debt': format_value(raw['net_debt'], 'currency'),
-                        'equity_value': format_value(dcf_calc['equity_value'], 'currency'),
+                        'fcf_base_formatted': format_value(raw['fcf_base'], 'currency', fx_rate),
+                        'sum_pv_fcf': format_value(dcf_calc['sum_pv_fcf'], 'currency', fx_rate),
+                        'terminal_value': format_value(dcf_calc['terminal_value'], 'currency', fx_rate),
+                        'pv_terminal_value': format_value(dcf_calc['pv_terminal_value'], 'currency', fx_rate),
+                        'enterprise_value': format_value(dcf_calc['enterprise_value'], 'currency', fx_rate),
+                        'cash': format_value(raw['total_cash'], 'currency', fx_rate),
+                        'debt': format_value(raw['total_debt'], 'currency', fx_rate),
+                        'net_debt': format_value(raw['net_debt'], 'currency', fx_rate),
+                        'equity_value': format_value(dcf_calc['equity_value'], 'currency', fx_rate),
                         'shares': format_value(raw['shares_outstanding'], 'number'),
-                        'fair_value': f"${dcf_calc['fair_value']:,.2f}",
+                        'fair_value': f"${dcf_calc['fair_value'] * fx_rate:,.2f}",
                         'growth_rate_used': f"{growth_pct:.1f}%",
                         'discount_rate_used': f"{discount_pct:.1f}%",
                         'terminal_growth_used': f"{dcf_calc['terminal_growth_used']*100:.1f}%",
@@ -1380,7 +1461,9 @@ def index_constituents(index_id):
         'sp500': 'S&P 500',
         'nasdaq100': 'Nasdaq 100',
         'dow30': 'Dow Jones 30',
-        'russell3000': 'Russell 3000'
+        'russell3000': 'Russell 3000',
+        'nikkei225': 'Nikkei 225',
+        'omxs30': 'OMX Stockholm 30'
     }
     
     if index_id not in supported_indices:
@@ -1684,6 +1767,8 @@ def terminal_command():
                 metric_query = aliases[metric_query]
                 
             stock = yf.Ticker(ticker)
+            currency = stock.info.get('financialCurrency', stock.info.get('currency', 'USD'))
+            fx_rate = get_usd_conversion_rate(currency)
             all_indexes = {}
             try:
                 dfs = [stock.income_stmt, stock.balance_sheet, stock.cashflow]
@@ -1714,13 +1799,13 @@ def terminal_command():
                     for col in row_data.index:
                         if str(col).startswith(year):
                             val = row_data[col]
-                            return jsonify({'action': 'print', 'text': f"{ticker} {actual_key} ({year}): {format_value(val, 'currency')}"})
+                            return jsonify({'action': 'print', 'text': f"{ticker} {actual_key} ({year}): {format_value(val, 'currency', fx_rate)}"})
                     return jsonify({'error': f"Found {actual_key} but no data for year {year}."})
                 else:
                     result_parts = []
                     for col in row_data.index:
                         year_str = str(col)[:4]
-                        val_str = format_value(row_data[col], 'currency')
+                        val_str = format_value(row_data[col], 'currency', fx_rate)
                         result_parts.append(f"{year_str}: {val_str}")
                     return jsonify({'action': 'print', 'text': f"{ticker} {actual_key} -> " + " | ".join(result_parts)})
             else:
@@ -1754,11 +1839,11 @@ def financial_data():
                 'price': price,
                 'pe': format_value(info.get('trailingPE'), 'ratio'),
                 'fwd_pe': format_value(info.get('forwardPE'), 'ratio'),
-                'market_cap': format_value(info.get('marketCap'), 'currency'),
-                'revenue': format_value(info.get('totalRevenue'), 'currency'),
-                'net_income': format_value(info.get('netIncomeToCommon'), 'currency'),
+                'market_cap': format_value(info.get('marketCap'), 'currency', fx_rate),
+                'revenue': format_value(info.get('totalRevenue'), 'currency', fx_rate),
+                'net_income': format_value(info.get('netIncomeToCommon'), 'currency', fx_rate),
                 'dividend_yield': format_value(info.get('dividendYield') / 100 if info.get('dividendYield') else None, 'pct'),
-                'dividend_rate': format_value(info.get('dividendRate'), 'currency'),
+                'dividend_rate': format_value(info.get('dividendRate'), 'currency', fx_rate),
                 'profit_margin': format_value(info.get('profitMargins'), 'pct'),
                 'roa': format_value(info.get('returnOnAssets'), 'pct'),
                 'roe': format_value(info.get('returnOnEquity'), 'pct'),
@@ -1852,3 +1937,7 @@ if __name__ == '__main__':
     # Binding to the dynamic port required by Cloud Run environment rules
     port = int(os.environ.get('PORT', 8080))
     app.run(debug=True, host='0.0.0.0', port=port)
+
+# Trigger Flask Reload
+
+# Hot reload trigger after JSON update

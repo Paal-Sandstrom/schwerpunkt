@@ -25652,5 +25652,1898 @@
         "growth": 10.31
       }
     ]
+  },
+  "nikkei225": {
+    "constituents": [
+      {
+        "symbol": "9984.T",
+        "name": "SOFTBANK GROUP CORP",
+        "market_cap": 264195805072,
+        "pe_ratio": 8.51,
+        "sector": "Communication Services"
+      },
+      {
+        "symbol": "7203.T",
+        "name": "TOYOTA MOTOR CORP",
+        "market_cap": 231886157515,
+        "pe_ratio": 9.65,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "8306.T",
+        "name": "MITSUBISHI UFJ FINANCIAL GROUP ",
+        "market_cap": 226612007284,
+        "pe_ratio": 15.15,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "8035.T",
+        "name": "TOKYO ELECTRON",
+        "market_cap": 169537989616,
+        "pe_ratio": 47.62,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "9983.T",
+        "name": "FAST RETAILING CO LTD",
+        "market_cap": 150750616464,
+        "pe_ratio": 50.51,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "6501.T",
+        "name": "HITACHI",
+        "market_cap": 149002743157,
+        "pe_ratio": 30.03,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "8316.T",
+        "name": "SUMITOMO MITSUI FINANCIAL GROUP",
+        "market_cap": 148256517983,
+        "pe_ratio": 15.13,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "6758.T",
+        "name": "SONY GROUP CORPORATION",
+        "market_cap": 130841967888,
+        "pe_ratio": 20.75,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "6857.T",
+        "name": "ADVANTEST CORP",
+        "market_cap": 121201832914,
+        "pe_ratio": 52.08,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "6861.T",
+        "name": "KEYENCE CORP",
+        "market_cap": 118198970129,
+        "pe_ratio": 42.55,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "8411.T",
+        "name": "MIZUHO FINANCIAL GROUP",
+        "market_cap": 117360080490,
+        "pe_ratio": 15.34,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "8058.T",
+        "name": "MITSUBISHI CORP",
+        "market_cap": 111065338149,
+        "pe_ratio": 23.15,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "6981.T",
+        "name": "MURATA MANUFACTURING CO",
+        "market_cap": 110169524932,
+        "pe_ratio": 75.76,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "6098.T",
+        "name": "RECRUIT HOLDINGS CO LTD",
+        "market_cap": 92049445893,
+        "pe_ratio": 30.49,
+        "sector": "Communication Services"
+      },
+      {
+        "symbol": "8031.T",
+        "name": "MITSUI & CO",
+        "market_cap": 89155023312,
+        "pe_ratio": 17.33,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "4063.T",
+        "name": "SHIN-ETSU CHEMICAL CO",
+        "market_cap": 85197361756,
+        "pe_ratio": 29.07,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "8766.T",
+        "name": "TOKIO MARINE HOLDINGS INC",
+        "market_cap": 83973838659,
+        "pe_ratio": 13.57,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "8001.T",
+        "name": "ITOCHU CORP",
+        "market_cap": 81751966588,
+        "pe_ratio": 14.64,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "7011.T",
+        "name": "MITSUBISHI HEAVY INDUSTRIES",
+        "market_cap": 79502045122,
+        "pe_ratio": 36.23,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "4519.T",
+        "name": "CHUGAI PHARMACEUTICAL CO",
+        "market_cap": 77609885992,
+        "pe_ratio": 28.65,
+        "sector": "Healthcare"
+      },
+      {
+        "symbol": "6503.T",
+        "name": "MITSUBISHI ELECTRIC CORP",
+        "market_cap": 76830616863,
+        "pe_ratio": 30.3,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "9432.T",
+        "name": "NTT INC",
+        "market_cap": 74212322077,
+        "pe_ratio": 11.58,
+        "sector": "Communication Services"
+      },
+      {
+        "symbol": "2914.T",
+        "name": "JAPAN TOBACCO INC",
+        "market_cap": 66194633406,
+        "pe_ratio": 21.23,
+        "sector": "Consumer Defensive"
+      },
+      {
+        "symbol": "5802.T",
+        "name": "SUMITOMO ELECTRIC INDUSTRIES",
+        "market_cap": 63343204621,
+        "pe_ratio": 27.47,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "9434.T",
+        "name": "SOFTBANK CORP.",
+        "market_cap": 63173219399,
+        "pe_ratio": 18.8,
+        "sector": "Communication Services"
+      },
+      {
+        "symbol": "9433.T",
+        "name": "KDDI CORPORATION",
+        "market_cap": 63018270224,
+        "pe_ratio": 14.45,
+        "sector": "Communication Services"
+      },
+      {
+        "symbol": "7741.T",
+        "name": "HOYA CORP",
+        "market_cap": 55005163717,
+        "pe_ratio": 35.46,
+        "sector": "Healthcare"
+      },
+      {
+        "symbol": "6752.T",
+        "name": "PANASONIC HOLDINGS CORP",
+        "market_cap": 54714016239,
+        "pe_ratio": 46.29,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "7974.T",
+        "name": "NINTENDO CO LTD",
+        "market_cap": 54148495279,
+        "pe_ratio": 20.66,
+        "sector": "Communication Services"
+      },
+      {
+        "symbol": "6723.T",
+        "name": "RENESAS ELECTRONICS CORP",
+        "market_cap": 51737651459,
+        "pe_ratio": 20.0,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "8002.T",
+        "name": "MARUBENI CORP",
+        "market_cap": 51483308583,
+        "pe_ratio": 15.29,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "8053.T",
+        "name": "SUMITOMO CORP",
+        "market_cap": 51046451537,
+        "pe_ratio": 13.72,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "5803.T",
+        "name": "FUJIKURA",
+        "market_cap": 49064612040,
+        "pe_ratio": 50.0,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "6762.T",
+        "name": "TDK CORP",
+        "market_cap": 48713419421,
+        "pe_ratio": 40.0,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "4502.T",
+        "name": "TAKEDA PHARMACEUTICAL CO LTD",
+        "market_cap": 48582448059,
+        "pe_ratio": 41.15,
+        "sector": "Healthcare"
+      },
+      {
+        "symbol": "6954.T",
+        "name": "FANUC CORPORATION",
+        "market_cap": 44552908704,
+        "pe_ratio": 42.92,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "6367.T",
+        "name": "DAIKIN INDUSTRIES",
+        "market_cap": 43326525026,
+        "pe_ratio": 25.25,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "8015.T",
+        "name": "TOYOTA TSUSHO CORP",
+        "market_cap": 42551366588,
+        "pe_ratio": 18.38,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "8591.T",
+        "name": "ORIX CORPORATION",
+        "market_cap": 40936310766,
+        "pe_ratio": 15.31,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "8725.T",
+        "name": "MS&AD INS GP HLDGS",
+        "market_cap": 39174923346,
+        "pe_ratio": 8.18,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "6702.T",
+        "name": "FUJITSU",
+        "market_cap": 38889477390,
+        "pe_ratio": 20.79,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "6301.T",
+        "name": "KOMATSU",
+        "market_cap": 37926695834,
+        "pe_ratio": 16.29,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "8750.T",
+        "name": "DAIICHI LIFE GROUP INC",
+        "market_cap": 37372453545,
+        "pe_ratio": 13.87,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "6178.T",
+        "name": "JAPAN POST HLDGS CO LTD",
+        "market_cap": 37184093843,
+        "pe_ratio": 16.45,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "6701.T",
+        "name": "NEC CORP",
+        "market_cap": 35271923744,
+        "pe_ratio": 20.96,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "7267.T",
+        "name": "HONDA MOTOR CO",
+        "market_cap": 35101679957,
+        "pe_ratio": 20.0,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "4578.T",
+        "name": "OTSUKA HLDGS CO LTD",
+        "market_cap": 34780437475,
+        "pe_ratio": 15.43,
+        "sector": "Healthcare"
+      },
+      {
+        "symbol": "8630.T",
+        "name": "SOMPO HOLDINGS INC",
+        "market_cap": 32851879591,
+        "pe_ratio": 8.41,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "6902.T",
+        "name": "DENSO CORP",
+        "market_cap": 31710992563,
+        "pe_ratio": 11.57,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "6971.T",
+        "name": "KYOCERA CORP",
+        "market_cap": 30593929518,
+        "pe_ratio": 36.23,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "8802.T",
+        "name": "MITSUBISHI ESTATE CO",
+        "market_cap": 29976286725,
+        "pe_ratio": 21.88,
+        "sector": "Real Estate"
+      },
+      {
+        "symbol": "8308.T",
+        "name": "RESONA HOLDINGS",
+        "market_cap": 29727789091,
+        "pe_ratio": 18.62,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "2802.T",
+        "name": "AJINOMOTO CO INC",
+        "market_cap": 29522861589,
+        "pe_ratio": 35.71,
+        "sector": "Consumer Defensive"
+      },
+      {
+        "symbol": "4568.T",
+        "name": "DAIICHI SANKYO COMPANY LIMITED",
+        "market_cap": 28285297430,
+        "pe_ratio": 17.73,
+        "sector": "Healthcare"
+      },
+      {
+        "symbol": "3382.T",
+        "name": "SEVEN & I HOLDINGS CO LTD",
+        "market_cap": 26893149031,
+        "pe_ratio": 15.67,
+        "sector": "Consumer Defensive"
+      },
+      {
+        "symbol": "1605.T",
+        "name": "INPEX CORPORATION",
+        "market_cap": 26735772145,
+        "pe_ratio": 11.15,
+        "sector": "Energy"
+      },
+      {
+        "symbol": "5108.T",
+        "name": "BRIDGESTONE CORP",
+        "market_cap": 26486758472,
+        "pe_ratio": 28.41,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "4901.T",
+        "name": "FUJIFILM HOLDINGS CORPORATION",
+        "market_cap": 26360850402,
+        "pe_ratio": 15.7,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "6273.T",
+        "name": "SMC CORP",
+        "market_cap": 25722782318,
+        "pe_ratio": 24.69,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "8801.T",
+        "name": "MITSUI FUDOSAN",
+        "market_cap": 25439707633,
+        "pe_ratio": 14.79,
+        "sector": "Real Estate"
+      },
+      {
+        "symbol": "8309.T",
+        "name": "SUMITOMO MITSUI TRUST GP INC",
+        "market_cap": 25358043637,
+        "pe_ratio": 12.9,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "8604.T",
+        "name": "NOMURA HOLDINGS INC.",
+        "market_cap": 24831282882,
+        "pe_ratio": 11.44,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "4503.T",
+        "name": "ASTELLAS PHARMA",
+        "market_cap": 24168096352,
+        "pe_ratio": 13.32,
+        "sector": "Healthcare"
+      },
+      {
+        "symbol": "9020.T",
+        "name": "EAST JAPAN RAILWAY CO",
+        "market_cap": 23716348907,
+        "pe_ratio": 15.34,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "6920.T",
+        "name": "LASERTEC CORP",
+        "market_cap": 23601302205,
+        "pe_ratio": 43.67,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "7751.T",
+        "name": "CANON INC",
+        "market_cap": 23519173447,
+        "pe_ratio": 11.88,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "8267.T",
+        "name": "AEON CO LTD",
+        "market_cap": 23393867604,
+        "pe_ratio": 50.5,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "7269.T",
+        "name": "SUZUKI MOTOR CORP",
+        "market_cap": 22467869376,
+        "pe_ratio": 8.2,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "4661.T",
+        "name": "ORIENTAL LAND CO",
+        "market_cap": 22317440179,
+        "pe_ratio": 29.32,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "5801.T",
+        "name": "FURUKAWA ELECTRIC CO",
+        "market_cap": 21541437479,
+        "pe_ratio": 47.62,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "5020.T",
+        "name": "ENEOS HOLDINGS INC",
+        "market_cap": 21443644264,
+        "pe_ratio": 13.3,
+        "sector": "Energy"
+      },
+      {
+        "symbol": "4543.T",
+        "name": "TERUMO CORP",
+        "market_cap": 20995395629,
+        "pe_ratio": 24.75,
+        "sector": "Healthcare"
+      },
+      {
+        "symbol": "6326.T",
+        "name": "KUBOTA CORP",
+        "market_cap": 20487349744,
+        "pe_ratio": 17.67,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "8830.T",
+        "name": "SUMITOMO REALTY & DEVELOPMENT C",
+        "market_cap": 20468814887,
+        "pe_ratio": 15.55,
+        "sector": "Real Estate"
+      },
+      {
+        "symbol": "9022.T",
+        "name": "CENTRAL JAPAN RAILWAY CO",
+        "market_cap": 19947493816,
+        "pe_ratio": 5.86,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "6594.T",
+        "name": "NIDEC CORPORATION",
+        "market_cap": 19843791244,
+        "pe_ratio": 26.45,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "4004.T",
+        "name": "RESONAC HOLDINGS CORPORATION",
+        "market_cap": 19562947091,
+        "pe_ratio": 107.53,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "5401.T",
+        "name": "NIPPON STEEL CORPORATION",
+        "market_cap": 17846533618,
+        "pe_ratio": 166.77,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "4689.T",
+        "name": "LY CORPORATION",
+        "market_cap": 17469455822,
+        "pe_ratio": 14.64,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "7013.T",
+        "name": "IHI CORPORATION",
+        "market_cap": 17035446265,
+        "pe_ratio": 16.95,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "4452.T",
+        "name": "KAO CORP",
+        "market_cap": 16719160703,
+        "pe_ratio": 25.51,
+        "sector": "Consumer Defensive"
+      },
+      {
+        "symbol": "9766.T",
+        "name": "KONAMI GROUP CORPORATION",
+        "market_cap": 16670908871,
+        "pe_ratio": 26.67,
+        "sector": "Communication Services"
+      },
+      {
+        "symbol": "9503.T",
+        "name": "KANSAI ELECTRIC POWER CO INC",
+        "market_cap": 16281113931,
+        "pe_ratio": 6.86,
+        "sector": "Utilities"
+      },
+      {
+        "symbol": "1925.T",
+        "name": "DAIWA HOUSE INDUSTRY CO",
+        "market_cap": 16204084468,
+        "pe_ratio": 7.4,
+        "sector": "Real Estate"
+      },
+      {
+        "symbol": "1812.T",
+        "name": "KAJIMA CORP",
+        "market_cap": 16169711686,
+        "pe_ratio": 14.64,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "9735.T",
+        "name": "SECOM CO",
+        "market_cap": 15929791174,
+        "pe_ratio": 22.83,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "5706.T",
+        "name": "MITSUI KINZOKU CO LTD",
+        "market_cap": 15890026166,
+        "pe_ratio": 27.86,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "6361.T",
+        "name": "EBARA CORP",
+        "market_cap": 15789076166,
+        "pe_ratio": 33.33,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "4507.T",
+        "name": "SHIONOGI & CO",
+        "market_cap": 15219990936,
+        "pe_ratio": 11.89,
+        "sector": "Healthcare"
+      },
+      {
+        "symbol": "3407.T",
+        "name": "ASAHI KASEI CORP",
+        "market_cap": 15127822328,
+        "pe_ratio": 15.27,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "7012.T",
+        "name": "KAWASAKI HEAVY INDUSTRIES",
+        "market_cap": 15077272868,
+        "pe_ratio": 22.32,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "7832.T",
+        "name": "BANDAI NAMCO HOLDINGS INC",
+        "market_cap": 15018470602,
+        "pe_ratio": 17.24,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "7735.T",
+        "name": "SCREEN HOLDINGS CO LTD",
+        "market_cap": 14908696661,
+        "pe_ratio": 25.97,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "5713.T",
+        "name": "SUMITOMO METAL MINING CO",
+        "market_cap": 14487914832,
+        "pe_ratio": 13.21,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "9101.T",
+        "name": "NIPPON YUSEN KABUSHIKI KAISHA",
+        "market_cap": 14130663081,
+        "pe_ratio": 11.11,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "6504.T",
+        "name": "FUJI ELECTRIC CO. LTD.",
+        "market_cap": 14121907873,
+        "pe_ratio": 23.04,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "1801.T",
+        "name": "TAISEI CORP",
+        "market_cap": 13508874773,
+        "pe_ratio": 12.94,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "8601.T",
+        "name": "DAIWA SECURITIES GROUP",
+        "market_cap": 13502845954,
+        "pe_ratio": 12.58,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "2502.T",
+        "name": "ASAHI GROUP HLDGS",
+        "market_cap": 13474628001,
+        "pe_ratio": 12.77,
+        "sector": "Consumer Defensive"
+      },
+      {
+        "symbol": "1802.T",
+        "name": "OBAYASHI CORP",
+        "market_cap": 13436276100,
+        "pe_ratio": 12.55,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "9502.T",
+        "name": "CHUBU ELECTRIC POWER CO INC",
+        "market_cap": 13182734285,
+        "pe_ratio": 9.27,
+        "sector": "Utilities"
+      },
+      {
+        "symbol": "8795.T",
+        "name": "T&D HOLDINGS INC",
+        "market_cap": 13150948789,
+        "pe_ratio": 15.15,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "9532.T",
+        "name": "OSAKA GAS CO",
+        "market_cap": 13115711124,
+        "pe_ratio": 14.03,
+        "sector": "Utilities"
+      },
+      {
+        "symbol": "2503.T",
+        "name": "KIRIN HOLDINGS COMPANY LIMITED",
+        "market_cap": 13101034286,
+        "pe_ratio": 14.33,
+        "sector": "Consumer Defensive"
+      },
+      {
+        "symbol": "1928.T",
+        "name": "SEKISUI HOUSE",
+        "market_cap": 12961770025,
+        "pe_ratio": 8.07,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "9531.T",
+        "name": "TOKYO GAS CO",
+        "market_cap": 12884092512,
+        "pe_ratio": 9.45,
+        "sector": "Utilities"
+      },
+      {
+        "symbol": "8697.T",
+        "name": "JAPAN EXCHANGE GROUP",
+        "market_cap": 12859766945,
+        "pe_ratio": 26.11,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "6988.T",
+        "name": "NITTO DENKO CORP",
+        "market_cap": 12804252382,
+        "pe_ratio": 15.53,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "7733.T",
+        "name": "OLYMPUS CORPORATION",
+        "market_cap": 12671955466,
+        "pe_ratio": 30.12,
+        "sector": "Healthcare"
+      },
+      {
+        "symbol": "6479.T",
+        "name": "MINEBEA MITSUMI INC",
+        "market_cap": 12520167984,
+        "pe_ratio": 20.24,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "9104.T",
+        "name": "MITSUI O.S.K. LINES LTD",
+        "market_cap": 12438433619,
+        "pe_ratio": 9.37,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "6976.T",
+        "name": "TAIYO YUDEN CO LTD",
+        "market_cap": 12373516105,
+        "pe_ratio": 147.06,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "5333.T",
+        "name": "NGK CORP",
+        "market_cap": 11548795687,
+        "pe_ratio": 31.95,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "7186.T",
+        "name": "YOKOHAMA FINANCIAL GROUP INC",
+        "market_cap": 11427915725,
+        "pe_ratio": 17.51,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "6506.T",
+        "name": "YASKAWA ELECTRIC CORP",
+        "market_cap": 11110658090,
+        "pe_ratio": 50.5,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "3659.T",
+        "name": "NEXON CO LTD",
+        "market_cap": 11104580176,
+        "pe_ratio": 19.72,
+        "sector": "Communication Services"
+      },
+      {
+        "symbol": "7270.T",
+        "name": "SUBARU CORPORATION",
+        "market_cap": 10962306414,
+        "pe_ratio": 19.57,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "1803.T",
+        "name": "SHIMIZU CORP",
+        "market_cap": 10661612486,
+        "pe_ratio": 13.48,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "9107.T",
+        "name": "KAWASAKI KISEN KAISHA",
+        "market_cap": 10660066006,
+        "pe_ratio": 12.84,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "5019.T",
+        "name": "IDEMITSU KOSAN CO.LTD",
+        "market_cap": 10446340748,
+        "pe_ratio": 9.83,
+        "sector": "Energy"
+      },
+      {
+        "symbol": "8331.T",
+        "name": "CHIBA BANK",
+        "market_cap": 10324296425,
+        "pe_ratio": 17.79,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "4755.T",
+        "name": "RAKUTEN GROUP INC",
+        "market_cap": 10281764935,
+        "pe_ratio": 20.0,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "5201.T",
+        "name": "AGC INC",
+        "market_cap": 10255926435,
+        "pe_ratio": 23.75,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "3402.T",
+        "name": "TORAY INDUSTRIES INC",
+        "market_cap": 10203093256,
+        "pe_ratio": 21.23,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "5831.T",
+        "name": "SHIZUOKA FINANCIAL GROUP INC.",
+        "market_cap": 9593410865,
+        "pe_ratio": 17.27,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "9843.T",
+        "name": "NITORI HOLDINGS CO LTD",
+        "market_cap": 9370764296,
+        "pe_ratio": 16.81,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "7202.T",
+        "name": "ISUZU MOTORS",
+        "market_cap": 9339804408,
+        "pe_ratio": 11.27,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "4188.T",
+        "name": "MITSUBISHI CHEMICAL GROUP CORP",
+        "market_cap": 9015313499,
+        "pe_ratio": 20.0,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "3436.T",
+        "name": "SUMCO CORPORATION",
+        "market_cap": 8822133522,
+        "pe_ratio": 20.0,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "2801.T",
+        "name": "KIKKOMAN CORP",
+        "market_cap": 8311770371,
+        "pe_ratio": 21.79,
+        "sector": "Consumer Defensive"
+      },
+      {
+        "symbol": "6841.T",
+        "name": "YOKOGAWA ELECTRIC CORP",
+        "market_cap": 8236774244,
+        "pe_ratio": 22.88,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "5332.T",
+        "name": "TOTO LTD",
+        "market_cap": 8214165352,
+        "pe_ratio": 32.89,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "8354.T",
+        "name": "FUKUOKA FINANCIAL GROUP INC.",
+        "market_cap": 8017998785,
+        "pe_ratio": 15.04,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "9202.T",
+        "name": "ANA HOLDINGS INC",
+        "market_cap": 7936193234,
+        "pe_ratio": 8.84,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "9147.T",
+        "name": "NIPPON EXPRESS HLDGS INC",
+        "market_cap": 7814071996,
+        "pe_ratio": 476.2,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "3099.T",
+        "name": "ISETAN MITSUKOSHI HOLDINGS LTD",
+        "market_cap": 7718447126,
+        "pe_ratio": 22.62,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "7911.T",
+        "name": "TOPPAN HOLDINGS INC",
+        "market_cap": 7615543160,
+        "pe_ratio": 18.94,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "7201.T",
+        "name": "NISSAN MOTOR CO",
+        "market_cap": 7591388606,
+        "pe_ratio": 20.0,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "6645.T",
+        "name": "OMRON CORP",
+        "market_cap": 7563849795,
+        "pe_ratio": 35.46,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "4151.T",
+        "name": "KYOWA KIRIN CO LTD",
+        "market_cap": 7480391391,
+        "pe_ratio": 17.86,
+        "sector": "Healthcare"
+      },
+      {
+        "symbol": "7272.T",
+        "name": "YAMAHA MOTOR CO",
+        "market_cap": 7414726515,
+        "pe_ratio": 7.62,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "6305.T",
+        "name": "HITACHI CONSTRUCTION MACHINERY",
+        "market_cap": 7191381984,
+        "pe_ratio": 15.75,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "9201.T",
+        "name": "JAPAN AIRLINES CO LTD",
+        "market_cap": 7167060508,
+        "pe_ratio": 8.7,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "9021.T",
+        "name": "WEST JAPAN RAILWAY CO",
+        "market_cap": 7126532897,
+        "pe_ratio": 9.03,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "7912.T",
+        "name": "DAI NIPPON PRINTING CO",
+        "market_cap": 7080706339,
+        "pe_ratio": 11.16,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "5101.T",
+        "name": "YOKOHAMA RUBBER CO",
+        "market_cap": 6920977802,
+        "pe_ratio": 10.52,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "2768.T",
+        "name": "SOJITZ CORPORATION",
+        "market_cap": 6742374429,
+        "pe_ratio": 10.49,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "4523.T",
+        "name": "EISAI CO LTD",
+        "market_cap": 6648353726,
+        "pe_ratio": 27.62,
+        "sector": "Healthcare"
+      },
+      {
+        "symbol": "2413.T",
+        "name": "M3 INC",
+        "market_cap": 6624834946,
+        "pe_ratio": 21.93,
+        "sector": "Healthcare"
+      },
+      {
+        "symbol": "4911.T",
+        "name": "SHISEIDO COMPANY LIMITED",
+        "market_cap": 6434051606,
+        "pe_ratio": 20.0,
+        "sector": "Consumer Defensive"
+      },
+      {
+        "symbol": "5411.T",
+        "name": "JFE HOLDINGS INC",
+        "market_cap": 6409534160,
+        "pe_ratio": 15.31,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "4021.T",
+        "name": "NISSAN CHEMICAL CORPORATION",
+        "market_cap": 6266684764,
+        "pe_ratio": 20.33,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "9602.T",
+        "name": "TOHO CO LTD",
+        "market_cap": 6226408762,
+        "pe_ratio": 19.61,
+        "sector": "Communication Services"
+      },
+      {
+        "symbol": "2269.T",
+        "name": "MEIJI HOLDINGS CO LTD",
+        "market_cap": 6217911711,
+        "pe_ratio": 28.41,
+        "sector": "Consumer Defensive"
+      },
+      {
+        "symbol": "4005.T",
+        "name": "SUMITOMO CHEMICAL COMPANY",
+        "market_cap": 6020622923,
+        "pe_ratio": 15.72,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "6113.T",
+        "name": "AMADA CO LTD",
+        "market_cap": 5994043094,
+        "pe_ratio": 31.95,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "9005.T",
+        "name": "TOKYU CORP",
+        "market_cap": 5991709054,
+        "pe_ratio": 19.88,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "6724.T",
+        "name": "SEIKO EPSON CORP",
+        "market_cap": 5926994568,
+        "pe_ratio": 52.08,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "3289.T",
+        "name": "TOKYU FUDOSAN HOLDINGS CORPORAT",
+        "market_cap": 5730812865,
+        "pe_ratio": 9.51,
+        "sector": "Real Estate"
+      },
+      {
+        "symbol": "4704.T",
+        "name": "TREND MICRO INC",
+        "market_cap": 5409841630,
+        "pe_ratio": 25.58,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "7752.T",
+        "name": "RICOH CO",
+        "market_cap": 5361024487,
+        "pe_ratio": 15.48,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "4042.T",
+        "name": "TOSOH CORP",
+        "market_cap": 5330860247,
+        "pe_ratio": 21.83,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "9501.T",
+        "name": "TOKYO ELEC POWER CO HLDGS INC",
+        "market_cap": 5286745046,
+        "pe_ratio": 20.0,
+        "sector": "Utilities"
+      },
+      {
+        "symbol": "4324.T",
+        "name": "DENTSU GROUP INC",
+        "market_cap": 5018753047,
+        "pe_ratio": 20.0,
+        "sector": "Communication Services"
+      },
+      {
+        "symbol": "5406.T",
+        "name": "KOBE STEEL",
+        "market_cap": 4778161575,
+        "pe_ratio": 8.14,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "4183.T",
+        "name": "MITSUI CHEMICALS INC",
+        "market_cap": 4716620238,
+        "pe_ratio": 22.83,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "6674.T",
+        "name": "GS YUASA CORP",
+        "market_cap": 4559208149,
+        "pe_ratio": 23.2,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "4751.T",
+        "name": "CYBER AGENT",
+        "market_cap": 4469925077,
+        "pe_ratio": 17.58,
+        "sector": "Communication Services"
+      },
+      {
+        "symbol": "7261.T",
+        "name": "MAZDA MOTOR CORP",
+        "market_cap": 4441807359,
+        "pe_ratio": 20.28,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "1808.T",
+        "name": "HASEKO CORPORATION",
+        "market_cap": 4384664900,
+        "pe_ratio": 12.97,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "6473.T",
+        "name": "JTEKT CORPORATION",
+        "market_cap": 4186156521,
+        "pe_ratio": 56.17,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "3861.T",
+        "name": "OJI HOLDINGS CORP",
+        "market_cap": 4181987978,
+        "pe_ratio": 22.57,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "8804.T",
+        "name": "TOKYO TATEMONO CO",
+        "market_cap": 4170866409,
+        "pe_ratio": 11.36,
+        "sector": "Real Estate"
+      },
+      {
+        "symbol": "4506.T",
+        "name": "SUMITOMO PHARMA CO LTD",
+        "market_cap": 4024276629,
+        "pe_ratio": 5.34,
+        "sector": "Healthcare"
+      },
+      {
+        "symbol": "7731.T",
+        "name": "NIKON CORP",
+        "market_cap": 4000733085,
+        "pe_ratio": 20.0,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "5711.T",
+        "name": "MITSUBISHI MATERIALS CORP",
+        "market_cap": 4000587847,
+        "pe_ratio": 15.8,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "1963.T",
+        "name": "JGC HOLDINGS CORPORATION",
+        "market_cap": 3994182226,
+        "pe_ratio": 15.29,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "4385.T",
+        "name": "MERCARI INC",
+        "market_cap": 3991445610,
+        "pe_ratio": 22.32,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "1721.T",
+        "name": "COMSYS HOLDINGS CORP",
+        "market_cap": 3932889226,
+        "pe_ratio": 17.57,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "6302.T",
+        "name": "SUMITOMO HEAVY INDUSTRIES",
+        "market_cap": 3915652922,
+        "pe_ratio": 20.41,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "2501.T",
+        "name": "SAPPORO HOLDINGS LIMITED",
+        "market_cap": 3846408230,
+        "pe_ratio": 40.99,
+        "sector": "Consumer Defensive"
+      },
+      {
+        "symbol": "8253.T",
+        "name": "CREDIT SAISON CO",
+        "market_cap": 3711938876,
+        "pe_ratio": 9.59,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "5714.T",
+        "name": "DOWA HOLDINGS",
+        "market_cap": 3694299996,
+        "pe_ratio": 9.53,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "8233.T",
+        "name": "TAKASHIMAYA CO",
+        "market_cap": 3665721198,
+        "pe_ratio": 20.0,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "5631.T",
+        "name": "JAPAN STEEL WORKS",
+        "market_cap": 3644075379,
+        "pe_ratio": 30.3,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "6471.T",
+        "name": "NSK",
+        "market_cap": 3630494579,
+        "pe_ratio": 25.51,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "9007.T",
+        "name": "ODAKYU ELECTRIC RAILWAY CO",
+        "market_cap": 3586074992,
+        "pe_ratio": 15.36,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "9064.T",
+        "name": "YAMATO HOLDINGS CO LTD",
+        "market_cap": 3556476662,
+        "pe_ratio": 41.84,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "2282.T",
+        "name": "NH FOODS LTD",
+        "market_cap": 3492387314,
+        "pe_ratio": 16.45,
+        "sector": "Consumer Defensive"
+      },
+      {
+        "symbol": "9001.T",
+        "name": "TOBU RAILWAY CO",
+        "market_cap": 3456864900,
+        "pe_ratio": 10.01,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "3086.T",
+        "name": "J FRONT RETAILING CO LTD",
+        "market_cap": 3447141710,
+        "pe_ratio": 19.8,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "7762.T",
+        "name": "CITIZEN WATCH CO LTD",
+        "market_cap": 3431728044,
+        "pe_ratio": 17.67,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "2002.T",
+        "name": "NISSHIN SEIFUN GROUP INC",
+        "market_cap": 3303328422,
+        "pe_ratio": 16.69,
+        "sector": "Consumer Defensive"
+      },
+      {
+        "symbol": "9301.T",
+        "name": "MITSUBISHI LOGISTICS CORP",
+        "market_cap": 3225067502,
+        "pe_ratio": 9.67,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "9009.T",
+        "name": "KEISEI ELECTRIC RAILWAY CO",
+        "market_cap": 3165555771,
+        "pe_ratio": 10.56,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "3405.T",
+        "name": "KURARAY CO",
+        "market_cap": 3070583907,
+        "pe_ratio": 68.97,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "8252.T",
+        "name": "MARUI GROUP CO LTD",
+        "market_cap": 3060103637,
+        "pe_ratio": 17.27,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "5233.T",
+        "name": "TAIHEIYO CEMENT CORP",
+        "market_cap": 3029266895,
+        "pe_ratio": 57.47,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "2871.T",
+        "name": "NICHIREI CORP",
+        "market_cap": 3027367138,
+        "pe_ratio": 17.73,
+        "sector": "Consumer Defensive"
+      },
+      {
+        "symbol": "7951.T",
+        "name": "YAMAHA CORP",
+        "market_cap": 3012522765,
+        "pe_ratio": 20.83,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "5214.T",
+        "name": "NIPPON ELECTRIC GLASS",
+        "market_cap": 2976111533,
+        "pe_ratio": 16.92,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "4631.T",
+        "name": "DIC CORPORATION",
+        "market_cap": 2906447900,
+        "pe_ratio": 14.39,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "7211.T",
+        "name": "MITSUBISHI MOTOR CORP",
+        "market_cap": 2823969548,
+        "pe_ratio": 45.25,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "2531.T",
+        "name": "TAKARA HOLDINGS INC",
+        "market_cap": 2670269421,
+        "pe_ratio": 33.78,
+        "sector": "Consumer Defensive"
+      },
+      {
+        "symbol": "6753.T",
+        "name": "SHARP CORP",
+        "market_cap": 2667561853,
+        "pe_ratio": 9.01,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "9008.T",
+        "name": "KEIO CORPORATION",
+        "market_cap": 2639518800,
+        "pe_ratio": 14.22,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "6770.T",
+        "name": "ALPS ALPINE CO LTD",
+        "market_cap": 2599303348,
+        "pe_ratio": 15.82,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "6952.T",
+        "name": "CASIO COMPUTER CO",
+        "market_cap": 2576346089,
+        "pe_ratio": 22.94,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "5301.T",
+        "name": "TOKAI CARBON CO",
+        "market_cap": 2531759989,
+        "pe_ratio": 20.2,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "4043.T",
+        "name": "TOKUYAMA CORP",
+        "market_cap": 2475635016,
+        "pe_ratio": 17.86,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "1332.T",
+        "name": "NISSUI CORPORATION",
+        "market_cap": 2379798017,
+        "pe_ratio": 13.95,
+        "sector": "Consumer Defensive"
+      },
+      {
+        "symbol": "8304.T",
+        "name": "AOZORA BANK",
+        "market_cap": 2265532729,
+        "pe_ratio": 14.14,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "4061.T",
+        "name": "DENKA COMPANY LIMITED",
+        "market_cap": 2212208408,
+        "pe_ratio": 22.57,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "3401.T",
+        "name": "TEIJIN LTD",
+        "market_cap": 1954606263,
+        "pe_ratio": 20.0,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "4902.T",
+        "name": "KONICA MINOLTA INC",
+        "market_cap": 1947587368,
+        "pe_ratio": 9.72,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "4208.T",
+        "name": "UBE CORPORATION",
+        "market_cap": 1792078131,
+        "pe_ratio": 12.02,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "2432.T",
+        "name": "DENA CO LTD",
+        "market_cap": 1626056558,
+        "pe_ratio": 15.6,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "6472.T",
+        "name": "NTN CORP",
+        "market_cap": 1614056093,
+        "pe_ratio": 18.59,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "6103.T",
+        "name": "OKUMA CORPORATION",
+        "market_cap": 1542579232,
+        "pe_ratio": 20.12,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "7004.T",
+        "name": "KANADEVIA CORPORATION",
+        "market_cap": 1414637826,
+        "pe_ratio": 20.37,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "5232.T",
+        "name": "SUMITOMO OSAKA CEMENT CO",
+        "market_cap": 1074068940,
+        "pe_ratio": 15.53,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "3863.T",
+        "name": "NIPPON PAPER INDUSTRIES CO LTD",
+        "market_cap": 878201032,
+        "pe_ratio": 11.99,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "5541.T",
+        "name": "PACIFIC METALS CO",
+        "market_cap": 246725231,
+        "pe_ratio": 15.58,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "7205.T",
+        "name": "7205.T",
+        "market_cap": 0,
+        "pe_ratio": 20.0,
+        "sector": "Other"
+      },
+      {
+        "symbol": "9613.T",
+        "name": "9613.T",
+        "market_cap": 0,
+        "pe_ratio": 20.0,
+        "sector": "Other"
+      }
+    ],
+    "growth": [
+      {
+        "year": 2015,
+        "growth": 9.07
+      },
+      {
+        "year": 2016,
+        "growth": 0.42
+      },
+      {
+        "year": 2017,
+        "growth": 19.1
+      },
+      {
+        "year": 2018,
+        "growth": -12.08
+      },
+      {
+        "year": 2019,
+        "growth": 18.2
+      },
+      {
+        "year": 2020,
+        "growth": 16.01
+      },
+      {
+        "year": 2021,
+        "growth": 4.91
+      },
+      {
+        "year": 2022,
+        "growth": -9.37
+      },
+      {
+        "year": 2023,
+        "growth": 28.24
+      },
+      {
+        "year": 2024,
+        "growth": 19.22
+      },
+      {
+        "year": 2025,
+        "growth": 26.18
+      },
+      {
+        "year": 2026,
+        "growth": 32.28
+      }
+    ]
+  },
+  "omxs30": {
+    "constituents": [
+      {
+        "symbol": "AZN.ST",
+        "name": "AstraZeneca PLC",
+        "market_cap": 285639895288,
+        "pe_ratio": 27.93,
+        "sector": "Healthcare"
+      },
+      {
+        "symbol": "ABB.ST",
+        "name": "ABB Ltd",
+        "market_cap": 189497116888,
+        "pe_ratio": 39.53,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "INVE-B.ST",
+        "name": "Investor AB ser. B",
+        "market_cap": 123076531421,
+        "pe_ratio": 6.11,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "ATCO-A.ST",
+        "name": "Atlas Copco AB ser. A",
+        "market_cap": 92478923325,
+        "pe_ratio": 33.57,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "VOLV-B.ST",
+        "name": "Volvo, AB ser. B",
+        "market_cap": 69121379074,
+        "pe_ratio": 19.88,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "NDA-SE.ST",
+        "name": "Nordea Bank Abp",
+        "market_cap": 63152484888,
+        "pe_ratio": 11.88,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "SAND.ST",
+        "name": "Sandvik AB",
+        "market_cap": 50381683961,
+        "pe_ratio": 32.16,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "ERIC-B.ST",
+        "name": "Ericsson, Telefonab. L M ser. B",
+        "market_cap": 42512164748,
+        "pe_ratio": 16.05,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "SWED-A.ST",
+        "name": "Swedbank AB ser A",
+        "market_cap": 39940284926,
+        "pe_ratio": 11.91,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "ASSA-B.ST",
+        "name": "ASSA ABLOY AB ser. B",
+        "market_cap": 38387974251,
+        "pe_ratio": 22.98,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "SEB-A.ST",
+        "name": "Skandinaviska Enskilda Banken s",
+        "market_cap": 38241053929,
+        "pe_ratio": 12.05,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "EQT.ST",
+        "name": "EQT AB",
+        "market_cap": 36379386732,
+        "pe_ratio": 43.7,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "EPI-A.ST",
+        "name": "Epiroc AB ser. A",
+        "market_cap": 34953397260,
+        "pe_ratio": 38.75,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "SAAB-B.ST",
+        "name": "SAAB AB ser. B",
+        "market_cap": 30139353565,
+        "pe_ratio": 44.07,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "SHB-A.ST",
+        "name": "Svenska Handelsbanken ser. A",
+        "market_cap": 28536148537,
+        "pe_ratio": 11.09,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "HM-B.ST",
+        "name": "Hennes & Mauritz AB, H & M ser.",
+        "market_cap": 28074575188,
+        "pe_ratio": 21.68,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "HEXA-B.ST",
+        "name": "Hexagon AB ser. B",
+        "market_cap": 24231741422,
+        "pe_ratio": 10.33,
+        "sector": "Technology"
+      },
+      {
+        "symbol": "ALFA.ST",
+        "name": "Alfa Laval AB",
+        "market_cap": 23577109476,
+        "pe_ratio": 27.24,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "INDU-C.ST",
+        "name": "Industriv\u00e4rden, AB ser. C",
+        "market_cap": 22775369289,
+        "pe_ratio": 5.36,
+        "sector": "Financial Services"
+      },
+      {
+        "symbol": "TELIA.ST",
+        "name": "Telia Company AB",
+        "market_cap": 20067828462,
+        "pe_ratio": 40.91,
+        "sector": "Communication Services"
+      },
+      {
+        "symbol": "ESSITY-B.ST",
+        "name": "Essity AB ser. B",
+        "market_cap": 18463226764,
+        "pe_ratio": 14.13,
+        "sector": "Consumer Defensive"
+      },
+      {
+        "symbol": "BOL.ST",
+        "name": "Boliden AB",
+        "market_cap": 16374304820,
+        "pe_ratio": 14.05,
+        "sector": "Basic Materials"
+      },
+      {
+        "symbol": "EVO.ST",
+        "name": "Evolution AB",
+        "market_cap": 14603808241,
+        "pe_ratio": 12.2,
+        "sector": "Consumer Cyclical"
+      },
+      {
+        "symbol": "LIFCO-B.ST",
+        "name": "Lifco AB ser.B",
+        "market_cap": 14535105886,
+        "pe_ratio": 37.17,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "TEL2-B.ST",
+        "name": "Tele2 AB ser. B",
+        "market_cap": 12777676977,
+        "pe_ratio": 12.05,
+        "sector": "Communication Services"
+      },
+      {
+        "symbol": "SKF-B.ST",
+        "name": "SKF, AB ser. B",
+        "market_cap": 11880846017,
+        "pe_ratio": 29.93,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "SKA-B.ST",
+        "name": "Skanska AB ser. B",
+        "market_cap": 10737216612,
+        "pe_ratio": 17.82,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "ADDT-B.ST",
+        "name": "Addtech AB ser. B",
+        "market_cap": 9272625664,
+        "pe_ratio": 40.8,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "NIBE-B.ST",
+        "name": "NIBE Industrier AB ser. B",
+        "market_cap": 7886344515,
+        "pe_ratio": 31.08,
+        "sector": "Industrials"
+      },
+      {
+        "symbol": "SCA-B.ST",
+        "name": "Svenska Cellulosa AB SCA ser. B",
+        "market_cap": 7583352106,
+        "pe_ratio": 25.78,
+        "sector": "Basic Materials"
+      }
+    ],
+    "growth": [
+      {
+        "year": 2015,
+        "growth": -1.21
+      },
+      {
+        "year": 2016,
+        "growth": 4.86
+      },
+      {
+        "year": 2017,
+        "growth": 3.94
+      },
+      {
+        "year": 2018,
+        "growth": -10.67
+      },
+      {
+        "year": 2019,
+        "growth": 25.78
+      },
+      {
+        "year": 2020,
+        "growth": 5.81
+      },
+      {
+        "year": 2021,
+        "growth": 29.07
+      },
+      {
+        "year": 2022,
+        "growth": -15.55
+      },
+      {
+        "year": 2023,
+        "growth": 17.36
+      },
+      {
+        "year": 2024,
+        "growth": 3.54
+      },
+      {
+        "year": 2025,
+        "growth": 16.1
+      },
+      {
+        "year": 2026,
+        "growth": 8.1
+      }
+    ]
   }
 }
