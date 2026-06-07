@@ -44,19 +44,19 @@
     </div>
 </div>
 
-<!-- Sub-View Navigation Tabs (Overview, Financials, DCF) -->
-<div class="subview-tabs">
-    <a href="{{ url_for('ticker_detail', symbol=symbol, view='overview') }}" class="subview-tab-item {% if view == 'overview' %}active{% endif %}">Overview</a>
-    <a href="{{ url_for('ticker_detail', symbol=symbol, view='financials') }}" class="subview-tab-item {% if view == 'financials' %}active{% endif %}">Financial Statements</a>
-    <a href="{{ url_for('ticker_detail', symbol=symbol, view='metrics') }}" class="subview-tab-item {% if view == 'metrics' %}active{% endif %}">Metrics History</a>
-    <a href="{{ url_for('ticker_detail', symbol=symbol, view='dcf') }}" class="subview-tab-item {% if view == 'dcf' %}active{% endif %}">DCF Valuation</a>
-</div>
 
 <!-- Main Split Body Layout -->
 <div class="layout-split">
     
     <!-- Left Column Content (Changes dynamically depending on active tab) -->
     <div class="layout-col-main">
+        <!-- Sub-View Navigation Tabs -->
+        <div class="subview-tabs">
+            <a href="{{ url_for('ticker_detail', symbol=symbol, view='overview') }}" class="subview-tab-item {% if view == 'overview' %}active{% endif %}">Overview</a>
+            <a href="{{ url_for('ticker_detail', symbol=symbol, view='financials') }}" class="subview-tab-item {% if view == 'financials' %}active{% endif %}">Financial Statements</a>
+            <a href="{{ url_for('ticker_detail', symbol=symbol, view='metrics') }}" class="subview-tab-item {% if view == 'metrics' %}active{% endif %}">Metrics History</a>
+            <a href="{{ url_for('ticker_detail', symbol=symbol, view='dcf') }}" class="subview-tab-item {% if view == 'dcf' %}active{% endif %}">DCF Valuation</a>
+        </div>
         
         <!-- ========================================== -->
         <!-- VIEW: OVERVIEW (Profile and History Chart) -->
