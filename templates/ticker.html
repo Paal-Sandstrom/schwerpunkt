@@ -9,7 +9,7 @@
         <div class="ticker-title-block">
             <div>
                 <span class="ticker-name">{{ snapshot.name }}</span>
-                <span class="ticker-symbol">({{ snapshot.symbol }} : NASDAQ/NYSE)</span>
+                <span class="ticker-symbol">({{ snapshot.symbol }} : {{ snapshot.exchange }})</span>
                 <div style="font-size: 11px; color: #666; margin-top: 4px;">
                     Sector: <span class="text-bold">{{ snapshot.sector }}</span> | Industry: <span class="text-bold">{{ snapshot.industry }}</span>
                 </div>

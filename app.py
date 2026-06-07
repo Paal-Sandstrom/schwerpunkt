@@ -1208,6 +1208,7 @@ def ticker_detail(symbol):
                 'sector': info.get('sector', 'N/A'),
                 'industry': info.get('industry', 'N/A'),
                 'summary': info.get('longBusinessSummary', 'No description available.'),
+                'exchange': info.get('exchange', 'NASDAQ/NYSE'),
                 'price': info.get('currentPrice') or info.get('regularMarketPrice') or info.get('previousClose') or 0.0
             }
             
@@ -1826,6 +1827,9 @@ def financial_data():
             stock = yf.Ticker(t)
             info = stock.info
             fast_info = stock.fast_info
+            
+            currency = info.get('currency', 'USD')
+            fx_rate = get_usd_conversion_rate(currency)
             
             # Determine price safely
             price = "N/A"
