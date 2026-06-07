@@ -1166,6 +1166,7 @@ def ticker_detail(symbol):
                 'Dividend Rate': format_value(info.get('dividendRate'), 'currency'),
                 'Dividend Yield': format_value(info.get('dividendYield') / 100 if info.get('dividendYield') else None, 'pct'),
                 'Ex-Dividend Date': format_ex_dividend_date(info.get('exDividendDate')),
+                'Next Earnings Date': format_ex_dividend_date(info.get('earningsTimestamp') or info.get('earningsTimestampStart')),
             }
             
             chart_data = get_chart_quotes_data(symbol, period)

@@ -14,6 +14,79 @@ document.addEventListener('DOMContentLoaded', () => {
         input.focus();
     });
 
+    // Auto-focus if we just navigated here via a terminal command
+    if (sessionStorage.getItem('focus_terminal_on_load') === 'true') {
+        input.focus();
+        sessionStorage.removeItem('focus_terminal_on_load');
+    }
+
+    // ----------------------------------------------------
+    // Floating Terminal Drag & Drop Logic
+    // ----------------------------------------------------
+    const terminalNode = document.getElementById('floating-terminal');
+    const dragHandle = document.getElementById('terminal-drag-handle');
+    
+    if (terminalNode && dragHandle) {
+        // Fallback positioning if no localStorage exists
+        const savedX = localStorage.getItem('terminal_x');
+        const savedY = localStorage.getItem('terminal_y');
+        
+        if (!savedX || !savedY) {
+            terminalNode.style.right = '20px';
+            terminalNode.style.top = '80px';
+            terminalNode.style.margin = '0';
+        } else {
+            terminalNode.style.left = savedX + 'px';
+            terminalNode.style.top = savedY + 'px';
+            terminalNode.style.margin = '0';
+            terminalNode.style.right = 'auto';
+            terminalNode.style.bottom = 'auto';
+        }
+
+        let isDragging = false;
+        let startX, startY, initialLeft, initialTop;
+
+        dragHandle.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            
+            const rect = terminalNode.getBoundingClientRect();
+            initialLeft = rect.left;
+            initialTop = rect.top;
+            
+            // Clear right/bottom so left/top changes actually apply
+            terminalNode.style.right = 'auto';
+            terminalNode.style.bottom = 'auto';
+            terminalNode.style.left = initialLeft + 'px';
+            terminalNode.style.top = initialTop + 'px';
+            
+            // Prevent text selection while dragging
+            document.body.style.userSelect = 'none';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            
+            terminalNode.style.left = (initialLeft + dx) + 'px';
+            terminalNode.style.top = (initialTop + dy) + 'px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                document.body.style.userSelect = '';
+                
+                const rect = terminalNode.getBoundingClientRect();
+                localStorage.setItem('terminal_x', rect.left);
+                localStorage.setItem('terminal_y', rect.top);
+            }
+        });
+    }
+
     function printTerminal(text, type = 'normal') {
         const div = document.createElement('div');
         if (type === 'error') div.className = 'terminal-error';
@@ -225,6 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (data.action === 'redirect') {
                     printTerminal(`Redirecting to ${data.url}...`, 'success');
+                    sessionStorage.setItem('focus_terminal_on_load', 'true');
                     window.location.href = data.url;
                 } else if (data.action === 'chart') {
                     printTerminal(`Rendering chart for ${data.symbol}...`, 'success');

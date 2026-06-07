@@ -178,38 +178,42 @@ a:hover {
 .app-content {
     flex: 1;
     padding: 16px;
-    border-right: 2px outset #ffffff;
-    border-right-color: #888888;
 }
 
 /* ---------------------------------------------------------
    INTERACTIVE TERMINAL
    --------------------------------------------------------- */
+
 .app-terminal {
     width: 320px;
-    background-color: #e9ebee; /* Classic Web 2.0 / Spreadsheet gray */
+    background-color: #eaf2ea; /* Light green tint */
     color: #333333;
     font-family: Tahoma, Arial, sans-serif;
     display: flex;
     flex-direction: column;
     padding: 12px;
     font-size: 11px;
-    border-left: 3px double #a9b3c4; /* Stronger separation */
-    border-right: 3px double #a9b3c4;
-    box-shadow: inset 2px 0px 4px rgba(0,0,0,0.06), inset -2px 0px 4px rgba(0,0,0,0.06);
-    max-height: 650px;
+    border: 5px solid #6b8e6b; /* Thicker solid green border to compensate for no shadow */
+    height: 550px; /* Fixed height so it stays the same size regardless of output */
+    position: fixed;
+    z-index: 9999;
 }
 
 .terminal-header {
     font-weight: bold;
     text-align: center;
     border: 1px solid #000000;
-    background: linear-gradient(to bottom, #d3d9e8, #c0c8d8);
+    background: linear-gradient(to bottom, #d6ebd6, #b8d4b8); /* Green gradient */
     padding: 8px;
     margin-bottom: 12px;
-    color: #000080;
+    color: #003300; /* Dark green text */
     letter-spacing: 0px;
     text-shadow: 1px 1px 0px #ffffff;
+    cursor: grab;
+    user-select: none;
+}
+.terminal-header:active {
+    cursor: grabbing;
 }
 
 .terminal-output {

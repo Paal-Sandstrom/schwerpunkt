@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 150" width="800" height="150">
     <!-- Base styling -->
     <style>
-        .stroke-dark { stroke: #3b5998; fill: none; stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
-        .stroke-dashed { stroke: #3b5998; fill: none; stroke-width: 1.5; stroke-dasharray: 6,6; }
-        .fill-dark { fill: #3b5998; }
-        .text-label { fill: #3b5998; font-family: Tahoma, Arial, sans-serif; font-size: 14px; font-weight: bold; }
-        .text-logo { fill: #3b5998; font-family: Tahoma, Arial, sans-serif; font-size: 80px; letter-spacing: 1px; }
+        .stroke-dark { stroke: #003300; fill: none; stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+        .stroke-dashed { stroke: #003300; fill: none; stroke-width: 1.5; stroke-dasharray: 6,6; }
+        .fill-dark { fill: #003300; }
+        .text-label { fill: #003300; font-family: Tahoma, Arial, sans-serif; font-size: 14px; font-weight: bold; }
+        .text-logo { fill: #003300; font-family: Tahoma, Arial, sans-serif; font-size: 80px; letter-spacing: 1px; }
     </style>
 
     <!-- Crop marks -->
