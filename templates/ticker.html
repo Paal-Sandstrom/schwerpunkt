@@ -853,6 +853,19 @@
         if (canvas && chartData && chartData.length) {
             new StockChart(canvas, chartData);
         }
+        
+        // Scroll restoration logic to prevent page jumping on tab or period changes
+        const scrollKey = 'scrollPos_' + window.location.pathname;
+        const savedScroll = sessionStorage.getItem(scrollKey);
+        if (savedScroll) {
+            // Slight delay ensures the DOM layout is fully calculated before jumping
+            setTimeout(() => window.scrollTo(0, parseInt(savedScroll, 10)), 10);
+            sessionStorage.removeItem(scrollKey);
+        }
+
+        window.addEventListener("beforeunload", function() {
+            sessionStorage.setItem(scrollKey, window.scrollY);
+        });
     });
 </script>
 {% endblock %}

@@ -1316,7 +1316,8 @@ def ticker_detail(symbol):
                 'total_debt': float(total_debt),
                 'net_debt': float(net_debt),
                 'shares_outstanding': float(shares_outstanding) if shares_outstanding else 0.0,
-                'default_growth': default_growth
+                'default_growth': default_growth,
+                'fx_rate': fx_rate
             }
             
             data = {
@@ -1340,6 +1341,7 @@ def ticker_detail(symbol):
     
     if view == 'dcf':
         raw = data['dcf_raw']
+        fx_rate = raw.get('fx_rate', 1.0)
         if raw['fcf_base'] <= 0:
             dcf_error = "Valuation Notice: The company has negative or unavailable Free Cash Flow (FCF) data. DCF valuation cannot be computed using negative cash flows."
         elif raw['shares_outstanding'] <= 0:
