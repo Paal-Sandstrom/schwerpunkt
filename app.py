@@ -22,12 +22,12 @@ app.secret_key = 'schwerpunkt_secret_key'
 # ---------------------------------------------------------
 # CONSTANTS & CONFIGURATION
 # ---------------------------------------------------------
-INDEX_SYMBOLS = ["^GSPC", "^RUA", "^IXIC", "^DJI"]
+INDEX_SYMBOLS = ["^GSPC", "^IXIC", "^N225", "^OMX"]
 INDEX_NAMES = {
     "^GSPC": "S&P 500",
-    "^RUA": "Russell 3000",
     "^IXIC": "Nasdaq",
-    "^DJI": "Dow Jones"
+    "^N225": "Nikkei 225",
+    "^OMX": "OMX Stockholm 30"
 }
 
 # Fallback stock list (used if Yahoo screener fails or is rate-limited)
@@ -932,6 +932,61 @@ def get_economic_calendar_mock():
         {"date": "Fri 09:45 AM", "event": "S&P Global Manufacturing PMI", "impact": "Med", "actual": "-", "forecast": "50.2"}
     ]
 
+def get_economic_calendar_live():
+    """Fetch live economic calendar from Yahoo Finance."""
+    cache_key = "economic_calendar_live"
+    cached = app_cache.get(cache_key)
+    if cached:
+        return cached
+
+    import requests
+    from bs4 import BeautifulSoup
+    import datetime
+    
+    events = []
+    base_date = datetime.date.today()
+    
+    try:
+        for i in range(7):
+            d = base_date + datetime.timedelta(days=i)
+            if d.weekday() >= 5: continue # Skip weekends
+            
+            url = f"https://finance.yahoo.com/calendar/economic?day={d.strftime('%Y-%m-%d')}"
+            res = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=5)
+            soup = BeautifulSoup(res.text, 'html.parser')
+            table = soup.find('table')
+            
+            if table:
+                for r in table.find_all('tr')[1:]:
+                    cols = r.find_all('td')
+                    if len(cols) >= 7:
+                        event = cols[0].text.strip()
+                        country = cols[1].text.strip()
+                        time_val = cols[2].text.strip()
+                        actual = cols[4].text.strip()
+                        forecast = cols[5].text.strip()
+                        
+                        if country in ['US', 'EU', 'GB', 'JP', 'DE']:
+                            impact = 'High' if any(x in event for x in ['GDP', 'CPI', 'Fed', 'Interest', 'Employment', 'Payroll', 'Jobless']) else 'Med'
+                            events.append({
+                                'date': f"{d.strftime('%a')} {time_val.replace('UTC', '').strip()}",
+                                'event': f"[{country}] {event[:35]}",
+                                'impact': impact,
+                                'actual': actual,
+                                'forecast': forecast
+                            })
+                            
+                            if len(events) >= 8: break
+            if len(events) >= 8: break
+    except Exception as e:
+        print(f"Calendar fetch error: {e}")
+        
+    if not events:
+        events = get_economic_calendar_mock()
+        
+    app_cache.set(cache_key, events, ttl=3600) # 1 hour cache
+    return events
+
 # ---------------------------------------------------------
 # INTERACTIVE DATA-SERIES GENERATION
 # ---------------------------------------------------------
@@ -1151,7 +1206,7 @@ def index():
     
     # NEW: Fetch sector performance and calendar
     sector_performance = get_sector_performance()
-    economic_calendar = get_economic_calendar_mock()
+    economic_calendar = get_economic_calendar_live()
     
     return render_template(
         'index.html',
@@ -1480,6 +1535,19 @@ def index_constituents(index_id):
     constituents = index_dataset.get('constituents', [])
     growth_data = index_dataset.get('growth', [])
     
+    index_ticker_map = {
+        'sp500': '^GSPC',
+        'nasdaq100': '^IXIC',
+        'dow30': '^DJI',
+        'russell3000': '^RUA',
+        'nikkei225': '^N225',
+        'omxs30': '^OMX'
+    }
+    try:
+        index_quote = fetch_index_quote(index_ticker_map[index_id])
+    except:
+        index_quote = None
+
     formatted_constituents = []
     for stock in constituents:
         market_cap = stock.get('market_cap')
@@ -1548,6 +1616,7 @@ def index_constituents(index_id):
         'constituents.html',
         index_id=index_id,
         index_name=index_name,
+        index_quote=index_quote,
         constituents=formatted_constituents,
         sector_concentration=sector_concentration,
         top_holdings=top_holdings,

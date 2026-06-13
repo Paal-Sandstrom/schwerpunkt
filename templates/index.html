@@ -5,7 +5,7 @@
 {% block content %}
 <!-- US Market Indices Box -->
 <div class="box">
-    <div class="box-header">US MARKET INDICES</div>
+    <div class="box-header">MARKET INDICES</div>
     <div class="box-body" style="padding: 0;">
         <table class="data-table">
             <thead>
@@ -20,7 +20,7 @@
                 {% for index in indices %}
                 <tr>
                     <td class="text-bold">
-                        <a href="{{ url_for('index_constituents', index_id='sp500' if index.symbol=='^GSPC' else ('nasdaq100' if index.symbol=='^IXIC' else ('dow30' if index.symbol=='^DJI' else 'russell3000'))) }}">{{ index.name }}</a>
+                        <a href="{{ url_for('index_constituents', index_id='sp500' if index.symbol=='^GSPC' else ('nasdaq100' if index.symbol=='^IXIC' else ('nikkei225' if index.symbol=='^N225' else 'omxs30'))) }}">{{ index.name }}</a>
                     </td>
                     {% if index.error %}
                     <td colspan="3" class="text-center" style="color: #888;">OFFLINE</td>
