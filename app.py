@@ -1629,6 +1629,10 @@ def index_constituents(index_id):
 def model_builder_view():
     return render_template('model_builder.html')
 
+@app.route('/screener')
+def screener():
+    return render_template('screener.html')
+
 @app.route('/guide')
 def guide_view():
     return render_template('guide.html')
