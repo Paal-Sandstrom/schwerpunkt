@@ -1740,8 +1740,8 @@ def terminal_command():
                 "- rm [name] : Delete a research folder\n"
                 "\n"
                 "[ SYSTEM ]\n"
-                "- nav [ticker|screener|home] : Navigate main window
-                - screener : Open stock screener\n"
+                "- nav [ticker|screener|home] : Navigate main window\n"
+                "- screener : Open stock screener\n"
                 "- /panic : Liquidate all assets and scramble MAC address\n"
                 "- clear : Clear terminal output"
             )
