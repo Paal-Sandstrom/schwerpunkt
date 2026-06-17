@@ -44,6 +44,7 @@
                 <a href="{{ url_for('stock_search_view') }}" class="web-nav-link {% if request.path.startswith('/ticker/') or request.path == '/stock' %}active{% endif %}">Stocks</a>
                 <a href="{{ url_for('index_constituents', index_id='sp500') }}" class="web-nav-link {% if request.path.startswith('/index-constituents/') %}active{% endif %}">Indices</a>
                 <a href="{{ url_for('model_builder_view') }}" class="web-nav-link {% if request.path == '/model-builder' %}active{% endif %}">Model Builder</a>
+                <a href="{{ url_for('screener') }}" class="web-nav-link {% if request.path == '/screener' %}active{% endif %}">Screener</a>
                 <a href="{{ url_for('guide_view') }}" class="web-nav-link {% if request.path == '/guide' %}active{% endif %}" {% if request.path != '/guide' %}style="color: #1f4d1f;"{% endif %}>Guide</a>
             </nav>
 

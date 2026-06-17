@@ -1740,12 +1740,15 @@ def terminal_command():
                 "- rm [name] : Delete a research folder\n"
                 "\n"
                 "[ SYSTEM ]\n"
-                "- nav [ticker] : Navigate main window to ticker page\n"
+                "- nav [ticker|screener|home] : Navigate main window
+                - screener : Open stock screener\n"
                 "- /panic : Liquidate all assets and scramble MAC address\n"
                 "- clear : Clear terminal output"
             )
             return jsonify({'action': 'print', 'text': help_text})
             
+        elif action == 'screener':
+            return jsonify({'action': 'redirect', 'url': url_for('screener')})
         elif action == 'nav' and len(parts) > 1:
             target = " ".join(parts[1:]).lower()
             if target in ['home', 'market home']:
@@ -1754,6 +1757,8 @@ def terminal_command():
                 return jsonify({'action': 'redirect', 'url': url_for('index_constituents', index_id='sp500')})
             elif target == 'model builder':
                 return jsonify({'action': 'redirect', 'url': url_for('model_builder_view')})
+            elif target == 'screener':
+                return jsonify({'action': 'redirect', 'url': url_for('screener')})
             elif target == 'guide':
                 return jsonify({'action': 'redirect', 'url': url_for('guide_view')})
             else:
