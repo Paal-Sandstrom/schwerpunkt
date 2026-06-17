@@ -1,0 +1,14 @@
+- `[x]` **Mobile Layout Fixes**
+  - `[x]` Add `@media (max-width: 768px)` to `static/style.css`.
+  - `[x]` Stack `.layout-split` columns vertically on small screens.
+  - `[x]` Adjust padding and layout sizes.
+  - `[x]` Add `overflow-x: auto` to tables so they can be scrolled horizontally.
+- `[x]` **Local Screener Tab**
+  - `[x]` Recompile `index_data.json` with 15+ new financial metrics (Finished).
+  - `[x]` Create `/screener` route in `app.py`.
+  - `[x]` Create `templates/screener.html`.
+  - `[x]` Write JS filtering logic in `screener.html` to process `index_data.json`.
+  - `[x]` Add "Screener" to the global navigation bar in `base.html`.
+- `[ ]` **Verification**
+  - `[ ]` Verify Screener works and returns expected data.
+  - `[ ]` Create walkthrough.

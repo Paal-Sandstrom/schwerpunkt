@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block title %}Schwerpunkt - Stock Screener{% endblock %}
+
+{% block content %}
+<div class="layout-split" style="flex-direction: column;">
+    <div class="box">
+        <div class="box-header">
+            SCREENER CRITERIA
+        </div>
+        <div class="box-body" style="background-color: #f6f7f9; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; padding: 15px;">
+            
+            <!-- 1. Descriptive -->
+            <div>
+                <label style="font-weight: bold; font-size: 11px;">Market Cap</label><br>
+                <select id="filter-market-cap" class="dcf-form-cell" style="width: 100%; margin-top: 5px;">
+                    <option value="any">Any</option>
+                    <option value="mega">Mega (>$200B)</option>
+                    <option value="large">Large ($10B - $200B)</option>
+                    <option value="mid">Mid ($2B - $10B)</option>
+                    <option value="small">Small (<$2B)</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-weight: bold; font-size: 11px;">Sector</label><br>
+                <select id="filter-sector" class="dcf-form-cell" style="width: 100%; margin-top: 5px;">
+                    <option value="any">Any</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Financial Services">Financial Services</option>
+                    <option value="Consumer Cyclical">Consumer Cyclical</option>
+                    <option value="Industrials">Industrials</option>
+                    <option value="Communication Services">Communication Services</option>
+                    <option value="Consumer Defensive">Consumer Defensive</option>
+                    <option value="Energy">Energy</option>
+                    <option value="Basic Materials">Basic Materials</option>
+                    <option value="Real Estate">Real Estate</option>
+                    <option value="Utilities">Utilities</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-weight: bold; font-size: 11px;">Country</label><br>
+                <select id="filter-country" class="dcf-form-cell" style="width: 100%; margin-top: 5px;">
+                    <option value="any">Any</option>
+                    <option value="United States">United States</option>
+                    <option value="Japan">Japan</option>
+                    <option value="Sweden">Sweden</option>
+                    <option value="China">China</option>
+                    <option value="United Kingdom">United Kingdom</option>
+                    <option value="non-us">Non-US</option>
+                </select>
+            </div>
+
+            <!-- 2. Valuation -->
+            <div>
+                <label style="font-weight: bold; font-size: 11px;">Trailing P/E</label><br>
+                <select id="filter-pe" class="dcf-form-cell" style="width: 100%; margin-top: 5px;">
+                    <option value="any">Any</option>
+                    <option value="profitable">> 0 (Profitable)</option>
+                    <option value="under15">< 15 (Value)</option>
+                    <option value="under20">< 20</option>
+                    <option value="over30">> 30 (Growth)</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-weight: bold; font-size: 11px;">Forward P/E</label><br>
+                <select id="filter-fwd-pe" class="dcf-form-cell" style="width: 100%; margin-top: 5px;">
+                    <option value="any">Any</option>
+                    <option value="under15">< 15</option>
+                    <option value="under20">< 20</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-weight: bold; font-size: 11px;">Price-to-Book</label><br>
+                <select id="filter-pb" class="dcf-form-cell" style="width: 100%; margin-top: 5px;">
+                    <option value="any">Any</option>
+                    <option value="under1">< 1 (Deep Value)</option>
+                    <option value="under3">< 3</option>
+                </select>
+            </div>
+
+            <!-- 3. Profitability & Health -->
+            <div>
+                <label style="font-weight: bold; font-size: 11px;">Return on Equity (ROE)</label><br>
+                <select id="filter-roe" class="dcf-form-cell" style="width: 100%; margin-top: 5px;">
+                    <option value="any">Any</option>
+                    <option value="positive">> 0%</option>
+                    <option value="over15">> 15%</option>
+                    <option value="over20">> 20%</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-weight: bold; font-size: 11px;">Profit Margin</label><br>
+                <select id="filter-margin" class="dcf-form-cell" style="width: 100%; margin-top: 5px;">
+                    <option value="any">Any</option>
+                    <option value="positive">> 0%</option>
+                    <option value="over10">> 10%</option>
+                    <option value="over20">> 20%</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-weight: bold; font-size: 11px;">Current Ratio</label><br>
+                <select id="filter-current" class="dcf-form-cell" style="width: 100%; margin-top: 5px;">
+                    <option value="any">Any</option>
+                    <option value="over1">> 1 (Healthy)</option>
+                    <option value="over2">> 2</option>
+                </select>
+            </div>
+
+            <!-- 4. Growth & Income -->
+            <div>
+                <label style="font-weight: bold; font-size: 11px;">Revenue Growth (YoY)</label><br>
+                <select id="filter-revgrowth" class="dcf-form-cell" style="width: 100%; margin-top: 5px;">
+                    <option value="any">Any</option>
+                    <option value="positive">> 0%</option>
+                    <option value="over10">> 10%</option>
+                    <option value="over20">> 20%</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-weight: bold; font-size: 11px;">Earnings Growth (YoY)</label><br>
+                <select id="filter-earngrowth" class="dcf-form-cell" style="width: 100%; margin-top: 5px;">
+                    <option value="any">Any</option>
+                    <option value="positive">> 0%</option>
+                    <option value="over10">> 10%</option>
+                    <option value="over20">> 20%</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-weight: bold; font-size: 11px;">Dividend Yield</label><br>
+                <select id="filter-div" class="dcf-form-cell" style="width: 100%; margin-top: 5px;">
+                    <option value="any">Any</option>
+                    <option value="over1">> 1%</option>
+                    <option value="over3">> 3%</option>
+                    <option value="over5">> 5%</option>
+                </select>
+            </div>
+            
+            <div style="grid-column: 1 / -1; display: flex; justify-content: flex-end; align-items: center;">
+                <span id="screener-count" style="margin-right: 15px; font-weight: bold; color: #1f4d1f;">Loading dataset...</span>
+                <button id="run-screener" class="app-button" disabled>RUN SCREENER</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="box" style="margin-top: 15px;">
+        <div class="box-header">
+            SCREENER RESULTS
+        </div>
+        <div class="box-body" style="overflow-x: auto;">
+            <table class="data-table" id="screener-table">
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Name</th>
+                        <th>Sector</th>
+                        <th>Country</th>
+                        <th>Market Cap</th>
+                        <th>Trailing P/E</th>
+                        <th>ROE</th>
+                        <th>Rev Growth</th>
+                        <th>Div Yield</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="9" style="text-align: center; color: #888; font-style: italic;">Awaiting query...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    let stockData = [];
+
+    // Helper to format large numbers
+    function formatMoney(n) {
+        if (!n) return 'N/A';
+        if (n >= 1e12) return '$' + (n / 1e12).toFixed(2) + 'T';
+        if (n >= 1e9) return '$' + (n / 1e9).toFixed(2) + 'B';
+        if (n >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
+        return '$' + n.toLocaleString();
+    }
+
+    function formatPercent(n) {
+        if (n === null || n === undefined) return 'N/A';
+        return (n * 100).toFixed(2) + '%';
+    }
+
+    function formatNum(n) {
+        if (n === null || n === undefined) return 'N/A';
+        return n.toFixed(2);
+    }
+
+    // Load data
+    fetch('/static/index_data.json')
+        .then(r => r.json())
+        .then(data => {
+            const symbolsSeen = new Set();
+            for (const key in data) {
+                const constits = data[key].constituents || [];
+                for (const item of constits) {
+                    if (!symbolsSeen.has(item.symbol)) {
+                        stockData.push(item);
+                        symbolsSeen.add(item.symbol);
+                    }
+                }
+            }
+            document.getElementById('screener-count').innerText = `Dataset Loaded: ${stockData.length} Stocks`;
+            document.getElementById('run-screener').disabled = false;
+        })
+        .catch(err => {
+            document.getElementById('screener-count').innerText = "Error loading dataset.";
+        });
+
+    document.getElementById('run-screener').addEventListener('click', () => {
+        const fCap = document.getElementById('filter-market-cap').value;
+        const fSec = document.getElementById('filter-sector').value;
+        const fCty = document.getElementById('filter-country').value;
+        const fPe = document.getElementById('filter-pe').value;
+        const fFwdPe = document.getElementById('filter-fwd-pe').value;
+        const fPb = document.getElementById('filter-pb').value;
+        const fRoe = document.getElementById('filter-roe').value;
+        const fMar = document.getElementById('filter-margin').value;
+        const fCur = document.getElementById('filter-current').value;
+        const fRev = document.getElementById('filter-revgrowth').value;
+        const fErn = document.getElementById('filter-earngrowth').value;
+        const fDiv = document.getElementById('filter-div').value;
+
+        const results = stockData.filter(s => {
+            // Cap
+            if (fCap === 'mega' && (!s.market_cap || s.market_cap < 200e9)) return false;
+            if (fCap === 'large' && (!s.market_cap || s.market_cap < 10e9 || s.market_cap >= 200e9)) return false;
+            if (fCap === 'mid' && (!s.market_cap || s.market_cap < 2e9 || s.market_cap >= 10e9)) return false;
+            if (fCap === 'small' && (!s.market_cap || s.market_cap >= 2e9)) return false;
+
+            // Sector
+            if (fSec !== 'any' && s.sector !== fSec) return false;
+
+            // Country
+            if (fCty === 'non-us' && (!s.country || s.country === 'United States')) return false;
+            else if (fCty !== 'any' && fCty !== 'non-us' && s.country !== fCty) return false;
+
+            // P/E
+            if (fPe === 'profitable' && (!s.pe_ratio || s.pe_ratio <= 0)) return false;
+            if (fPe === 'under15' && (!s.pe_ratio || s.pe_ratio <= 0 || s.pe_ratio >= 15)) return false;
+            if (fPe === 'under20' && (!s.pe_ratio || s.pe_ratio <= 0 || s.pe_ratio >= 20)) return false;
+            if (fPe === 'over30' && (!s.pe_ratio || s.pe_ratio < 30)) return false;
+
+            // Fwd PE
+            if (fFwdPe === 'under15' && (!s.forwardPE || s.forwardPE <= 0 || s.forwardPE >= 15)) return false;
+            if (fFwdPe === 'under20' && (!s.forwardPE || s.forwardPE <= 0 || s.forwardPE >= 20)) return false;
+
+            // P/B
+            if (fPb === 'under1' && (!s.priceToBook || s.priceToBook <= 0 || s.priceToBook >= 1)) return false;
+            if (fPb === 'under3' && (!s.priceToBook || s.priceToBook <= 0 || s.priceToBook >= 3)) return false;
+
+            // ROE
+            if (fRoe === 'positive' && (!s.returnOnEquity || s.returnOnEquity <= 0)) return false;
+            if (fRoe === 'over15' && (!s.returnOnEquity || s.returnOnEquity <= 0.15)) return false;
+            if (fRoe === 'over20' && (!s.returnOnEquity || s.returnOnEquity <= 0.20)) return false;
+
+            // Margin
+            if (fMar === 'positive' && (!s.profitMargins || s.profitMargins <= 0)) return false;
+            if (fMar === 'over10' && (!s.profitMargins || s.profitMargins <= 0.10)) return false;
+            if (fMar === 'over20' && (!s.profitMargins || s.profitMargins <= 0.20)) return false;
+
+            // Current
+            if (fCur === 'over1' && (!s.currentRatio || s.currentRatio <= 1)) return false;
+            if (fCur === 'over2' && (!s.currentRatio || s.currentRatio <= 2)) return false;
+
+            // Rev Growth
+            if (fRev === 'positive' && (!s.revenueGrowth || s.revenueGrowth <= 0)) return false;
+            if (fRev === 'over10' && (!s.revenueGrowth || s.revenueGrowth <= 0.10)) return false;
+            if (fRev === 'over20' && (!s.revenueGrowth || s.revenueGrowth <= 0.20)) return false;
+
+            // Ern Growth
+            if (fErn === 'positive' && (!s.earningsGrowth || s.earningsGrowth <= 0)) return false;
+            if (fErn === 'over10' && (!s.earningsGrowth || s.earningsGrowth <= 0.10)) return false;
+            if (fErn === 'over20' && (!s.earningsGrowth || s.earningsGrowth <= 0.20)) return false;
+
+            // Div
+            if (fDiv === 'over1' && (!s.dividendYield || s.dividendYield <= 0.01)) return false;
+            if (fDiv === 'over3' && (!s.dividendYield || s.dividendYield <= 0.03)) return false;
+            if (fDiv === 'over5' && (!s.dividendYield || s.dividendYield <= 0.05)) return false;
+
+            return true;
+        });
+
+        // Sort by market cap descending
+        results.sort((a, b) => (b.market_cap || 0) - (a.market_cap || 0));
+
+        const tbody = document.querySelector('#screener-table tbody');
+        tbody.innerHTML = '';
+
+        if (results.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #888;">No stocks matched your criteria.</td></tr>';
+            document.getElementById('screener-count').innerText = `0 Matches`;
+            return;
+        }
+
+        document.getElementById('screener-count').innerText = `${results.length} Matches`;
+
+        // Render top 100 to avoid locking browser
+        for (let i = 0; i < Math.min(results.length, 100); i++) {
+            const s = results[i];
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-weight: bold;"><a href="/ticker/${s.symbol}" style="color: #1f4d1f; text-decoration: none;">${s.symbol}</a></td>
+                <td>${s.name || s.symbol}</td>
+                <td>${s.sector || 'N/A'}</td>
+                <td>${s.country || 'N/A'}</td>
+                <td>${formatMoney(s.market_cap)}</td>
+                <td>${formatNum(s.pe_ratio)}</td>
+                <td>${formatPercent(s.returnOnEquity)}</td>
+                <td>${formatPercent(s.revenueGrowth)}</td>
+                <td>${formatPercent(s.dividendYield)}</td>
+            `;
+            tbody.appendChild(tr);
+        }
+        if (results.length > 100) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td colspan="9" style="text-align: center; color: #888;">Showing top 100 results by market cap...</td>`;
+            tbody.appendChild(tr);
+        }
+    });
+</script>
+{% endblock %}
