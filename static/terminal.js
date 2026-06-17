@@ -28,14 +28,21 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (terminalNode && dragHandle) {
         // Fallback positioning if no localStorage exists
-        const savedX = localStorage.getItem('terminal_x');
-        const savedY = localStorage.getItem('terminal_y');
+        let savedX = parseInt(localStorage.getItem('terminal_x'));
+        let savedY = parseInt(localStorage.getItem('terminal_y'));
         
-        if (!savedX || !savedY) {
+        if (isNaN(savedX) || isNaN(savedY)) {
             terminalNode.style.right = '20px';
             terminalNode.style.top = '80px';
             terminalNode.style.margin = '0';
         } else {
+            const maxX = window.innerWidth - 320;
+            const maxY = window.innerHeight - 50;
+            if (savedX > maxX) savedX = Math.max(0, maxX);
+            if (savedY > maxY) savedY = Math.max(0, maxY);
+            if (savedX < 0) savedX = 0;
+            if (savedY < 0) savedY = 0;
+            
             terminalNode.style.left = savedX + 'px';
             terminalNode.style.top = savedY + 'px';
             terminalNode.style.margin = '0';
